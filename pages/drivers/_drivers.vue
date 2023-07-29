@@ -17,7 +17,7 @@
         ></PopUp>
         <CreateDriver
             :type="'update'"
-            :assetProp="currentAsset"
+            :assetProp="currentDriver"
             v-show="isShowPopup === 'thêm mới'"
             @closePopup="closePopup"
             @submitForm="submitForm"
@@ -90,7 +90,7 @@
                         <h1 class="empty-err-mess">Không có dữ liệu</h1>
                     </div>
                     <DriverItem
-                        v-for="(item, index) in listAssets"
+                        v-for="(item, index) in listDrivers"
                         :type="'asset'"
                         :key="index"
                         :itemProp="item"
@@ -163,32 +163,7 @@ export default {
     },
     data() {
         return {
-            listAssets: [
-                {
-                    id: '6a386c58-dd12-44b8',
-                    address: 'abc',
-                    bankId: '970422',
-                    bankNumber: '068866789999',
-                    email: 'anhanh2003+3@gmail.com',
-                    fullName: 'Bui Tuan Anh',
-                    password: '$2b',
-                    phoneNumber: '0342973670',
-                    qrcodeURL: 'https://storage.googleapis.com/oil-picker-project.appspot.com/qr_codes/qr_code_1690124695580.png',
-                    role: 'client'
-                },
-                {
-                    id: '6a386c58-dd12-44b8',
-                    address: 'abc',
-                    bankId: '970422',
-                    bankNumber: '068866789999',
-                    email: 'anhanh2003+3@gmail.com',
-                    fullName: 'Bui Tuan Anh',
-                    password: '$2b',
-                    phoneNumber: '0342973670',
-                    qrcodeURL: 'https://storage.googleapis.com/oil-picker-project.appspot.com/qr_codes/qr_code_1690124695580.png',
-                    role: 'client'
-                }
-            ],
+            listDrivers: [],
             meta: [],
             currentPage: 1,
             assetID: {},
@@ -203,7 +178,7 @@ export default {
             searchValue: '',
             timeoutId: null, // thêm biến timeoutId vào component
             selectedOption: '',
-            currentAsset: {},
+            currentDriver: {},
             options: [
                 'Đang hoạt động',
                 'Đang tạm nghỉ',
@@ -233,18 +208,18 @@ export default {
         // if(this.BillID != undefined) {
         //     this.fetchDetailBill();
         // }
-        // this.refreshData();
+        this.refreshData();
         // this.fetchListBills();
     },
     watch: {
         pageParam: async function () {
             this.refreshData();
         },
-        listAssets: {
+        listDrivers: {
             deep: true,
             immediate: true,
             handler(newVal) {
-                if (newVal.length > 0) {
+                if (newVal) {
                     this.isHaveContent = true;
                 } else {
                     this.isHaveContent = false;
@@ -260,60 +235,16 @@ export default {
                 this.fetchData();
             }
         },
-        async downloadFile() {
-            try {
-                const { selectedOption, searchValue, selectedBill } = this;
-                let apiURL = '/assets?pageNumber=1&pageSize=10&isConvert=true'; // đường dẫn tới API download file
-                if (selectedOption && selectedOption !== 'Tất cả') {
-                    apiURL += `&status=${selectedOption}`;
-                }
-                if (searchValue) {
-                    apiURL += `&searchQuery=${searchValue}`;
-                }
-                if(selectedBill) {
-                    apiURL += `&Bill_id=${selectedBill.BillID}`;
-                }
-                const response = await this.$axios({
-                    method: 'get',
-                    url: apiURL,
-                    responseType: 'blob', // yêu cầu Axios trả về dữ liệu dạng blob (binary large object)
-                });
-                // Tạo đường dẫn đến tệp được tải xuống
-                const url = window.URL.createObjectURL(
-                    new Blob([response.data])
-                );
-                // Tạo một thẻ a để kích hoạt tải xuống tệp
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'SoTheoDoiTSCD.xlsx');
-                document.body.appendChild(link);
-                link.click();
-                // Xóa đối tượng thẻ a để tránh hiển thị thừa trên trang
-                document.body.removeChild(link);
-                this.setNotification('Export', 'file', 'thành công');
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-            } catch (error) {
-                this.setNotification('Export', 'file', 'thất bại');
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-            }
-        },
         async fetchData() {
             try {
                 const response = await this.$axios.get(
-                    `/assets?pageNumber=${this.currentPage}&pageSize=10`
+                    `/users?page=${this.currentPage}&searchVal=driver&searchType=role`
                 );
-                this.listAssets = response.data.data;
+                this.listDrivers = response.data.data;
                 this.meta = response.data.meta;
-                console.log(this.listAssets);
+                console.log(this.listDrivers);
             } catch (error) {
                 console.log(error);
-                this.setNotification('Tải', 'dữ liệu', 'thất bại');
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
@@ -322,12 +253,11 @@ export default {
         },
         async fetchDetail(id) {
             try {
-                await this.$axios.get(`/assets/${id}`).then((res) => {
-                    this.currentAsset = res['data']['data'];
-                    console.log(this.currentAsset);
+                await this.$axios.get(`/drivers/${id}`).then((res) => {
+                    this.currentDriver = res['data']['data'];
+                    console.log(this.currentDriver);
                 });
             } catch (error) {
-                this.setNotification('Tải', 'dữ liệu', 'thất bại');
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
@@ -339,7 +269,7 @@ export default {
             this.currentPage = this.pageParam;
             try {
                 const { currentPage, selectedOption, searchValue, selectedBill, BillID } = this;
-                let url = `/assets?pageNumber=${currentPage}&pageSize=10`;
+                let url = `/assets?page=${currentPage}&pageSize=10`;
                 if (selectedOption && selectedOption !== 'Tất cả') {
                     url += `&status=${selectedOption}`;
                 }
@@ -347,17 +277,17 @@ export default {
                     url += `&searchQuery=${searchValue}`;
                 }
                 if(selectedBill) {
-                    url += `&Bill_id=${selectedBill.BillID}`;
+                    url += `&id=${selectedBill.BillID}`;
                 }
                 if(selectedBill === '' && BillID) {
-                    url += `&Bill_id=${BillID}`;
+                    url += `&id=${BillID}`;
                 }
                 const {
                     data: { data, meta },
                 } = await this.$axios.get(url);
-                this.listAssets = data;
+                this.listDrivers = data;
                 this.meta = meta;
-                console.log(this.listAssets);
+                console.log(this.listDrivers);
                 // Lưu trạng thái của selectedOption và searchValue vào URL của trang web
                 const query = {};
                 if (selectedOption) {
@@ -372,7 +302,7 @@ export default {
                 if(selectedBill === '') {
                     query.Bill_id = BillID;
                 }
-                this.$router.push({ path: `/assets?page=${currentPage}`, query });
+                this.$router.push({ path: `/drivers?page=${currentPage}`, query });
             } catch (error) {
                 console.error(error);
                 this.setNotification('Tải', 'dữ liệu', 'thất bại');
@@ -389,9 +319,9 @@ export default {
                 this.Search();
             }, 700); // tạo mới setTimeout() với thời gian chờ là 700ms
         },
-        async addAsset(asset) {
+        async addDriver(asset) {
             try {
-                await this.$axios.post(`/assets`, {
+                await this.$axios.post(`/drivers`, {
                     deviceID: asset.deviceID,
                     BillID: asset.BillID,
                     assetName: asset.assetName,
@@ -402,14 +332,12 @@ export default {
                     status: 'Hoạt động tốt',
                     notes: asset.notes,
                 });
-                this.setNotification('Thêm mới', 'tài sản', 'thành công');
                 this.showNotification = true;
                 this.refreshData();
                 setTimeout(() => {
                     this.showNotification = '';
                 }, 3000);
             } catch (error) {
-                this.setNotification('Thêm mới', 'tài sản', 'thất bại');
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
@@ -431,14 +359,12 @@ export default {
                     status: asset.status,
                     notes: asset.notes,
                 });
-                this.setNotification('Cập nhật', 'tài sản', 'thành công');
                 this.showNotification = true;
                 this.refreshData();
                 setTimeout(() => {
                     this.showNotification = false;
                 }, 3000);
             } catch (error) {
-                this.setNotification('Cập nhật', 'tài sản', 'thất bại');
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
@@ -448,15 +374,13 @@ export default {
         },
         async deleteAsset() {
             try {
-                await this.$axios.delete(`/assets/${this.assetID}`);
-                this.setNotification('Xóa', 'tài sản', 'thành công');
+                await this.$axios.delete(`/drivers/${this.id}`);
                 this.showNotification = true;
                 this.refreshData();
                 setTimeout(() => {
                     this.showNotification = false;
                 }, 3000);
             } catch (error) {
-                this.setNotification('Xóa', 'tài sản', 'thất bại');
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
@@ -464,24 +388,7 @@ export default {
                 console.log(error);
             }
         },
-        async disposeAsset() {
-            try {
-                await this.$axios.post(`/assets/${this.assetID}`);
-                this.setNotification('Thanh lý', 'tài sản', 'thành công');
-                this.showNotification = true;
-                this.refreshData();
-                setTimeout(() => {
-                    this.showNotification = '';
-                }, 3000);
-            } catch (error) {
-                this.setNotification('Thanh lý', 'tài sản', 'thất bại');
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-                console.log(error);
-            }
-        },
+        
         closeTab() {
             document
                 .querySelector('.main-content')
@@ -493,31 +400,6 @@ export default {
             document
                 .querySelector('.page-top')
                 .classList.remove('open-collapse');
-        },
-        async fetchListBills() {
-            try {
-                const response = await this.$axios.get(`/Bills`);
-                this.listBills = response.data.data;
-            } catch (error) {
-                console.log(error);
-            }
-        },
-        async fetchDetailBill() {
-            try {
-                await this.$axios
-                    .get(`/Bills/${this.BillID}`)
-                    .then((res) => {
-                        this.selectedBill = res['data']['data'];
-                        console.log(this.selectedBill);
-                    });
-            } catch (error) {
-                console.log(error);
-            }
-        },
-        setNotification(action, object, type) {
-            this.notiAction = action;
-            this.notiObject = object;
-            this.notiType = type;
         },
         openTab() {
             document
@@ -533,7 +415,6 @@ export default {
         },
         showPopup(action, object, id) {
             if (action == 'thêm mới') {
-                this.fetchDetail(id);
                 this.isShowPopup = action;
             } else if (action == 'xuất file') {
                 this.notiObject = object;
@@ -551,21 +432,15 @@ export default {
             this.isShowPopup = false;
             if (action === 'xóa') {
                 this.deleteAsset();
-            } else if (action === 'thanh lý') {
-                this.disposeAsset();
             } else if (action === 'thêm mới') {
                 if (!asset.assetID) {
-                    this.addAsset(asset);
-                } else {
-                    this.updateAsset(asset);
-                }
-            } else {
-                this.downloadFile();
+                    this.addDriver(asset);
+                } 
             }
         },
         closePopup() {
             this.isShowPopup = '';
-            this.currentAsset = {};
+            this.currentDriver = {};
         },
         goToIndexPage() {
             const query = {};

@@ -3,31 +3,30 @@
         <div class="item div-center">
             <p
                 class="div-center stt-col"
-                @click="$router.push(`/Bills?page=1&organization_id=${itemProp.organizationID}`)"
+
             >
                 {{ itemIndex }}
             </p>
             <p
                 class="div-center day-col"
-                @click="$router.push(`/Bills?page=1&organization_id=${itemProp.organizationID}`)"
+
             >
-                {{ itemProp.user_id }}
+                {{ formattedDate(itemProp.order_date) }}
             </p>
             <p
             class="div-center type-col"
-            @click="$router.push(`/Bills?page=1&organization_id=${itemProp.organizationID}`)"
             >
             {{ itemProp.order_type }}
             </p>
             <p
                 class="div-center appoint-day-col"
-                @click="$router.push(`/Bills?page=1&organization_id=${itemProp.organizationID}`)"
+
             >
                 {{ itemProp.recurring_day_of_week }}
             </p>
             <p
                 class="div-center appoint-time-col"
-                @click="$router.push(`/Bills?page=1&organization_id=${itemProp.organizationID}`)"
+
             >
                 {{ itemProp.recurring_time }}
             </p>
@@ -59,6 +58,7 @@
 </template>
 
 <script>
+import { format, parse } from 'date-fns';
 export default {
     props: ['type', 'itemProp', 'itemIndex'],
     computed: {
@@ -76,6 +76,10 @@ export default {
             document
                 .querySelector('.tooltip' + this.itemIndex)
                 .classList.remove('display-block');
+        },
+        formattedDate(order_date) {
+            const date = new Date(order_date);
+            return format(date, 'dd/MM/yyyy');
         },
     },
 };

@@ -90,7 +90,7 @@
                         <h1 class="empty-err-mess">Không có dữ liệu</h1>
                     </div>
                     <OrderItem
-                        v-for="(item, index) in listorders"
+                        v-for="(item, index) in listOrders"
                         :type="'orders'"
                         :key="index"
                         :itemProp="item"
@@ -165,22 +165,7 @@ export default {
     },
     data() {
         return {
-            listorders: [
-                {
-                    user_id: '6a386c58-dd12-44b8',
-                    order_date: 'abc',
-                    order_type: 'Lấy liền',
-                    recurring_day_of_week: '',
-                    recurring_time: ''
-                },
-                {
-                    user_id: '6a386c58-dd12-44b8',
-                    order_date: 'abc',
-                    order_type: 'Đặt lịch',
-                    recurring_day_of_week: '1000',
-                    recurring_time: '10'
-                },
-            ],
+            listOrders: [],
             meta: [],
             currentPage: 1,
             ordersID: {},
@@ -214,7 +199,7 @@ export default {
         // if (this.searchValue !== '' || this.selectedOption !== '') {
         //     this.Search();
         // } else {
-        //     this.fetchData();
+            this.fetchData();
         // }
     },
     watch: {
@@ -225,11 +210,11 @@ export default {
                 this.fetchData();
             }
         },
-        listorders: {
+        listOrders: {
             deep: true,
             immediate: true,
             handler(newVal) {
-                if (newVal.length > 0) {
+                if (newVal) {
                     this.isHaveContent = true;
                 } else {
                     this.isHaveContent = false;
@@ -240,7 +225,7 @@ export default {
     methods: {
         async downloadFile() {
             const { selectedOption, searchValue } = this;
-            let apiURL = `/orders?pageNumber=1&pageSize=10&isConvert=true`;
+            let apiURL = `/orders?page=1`;
             if (selectedOption && selectedOption !== 'Tất cả') {
                 apiURL += `&ordersType=${selectedOption}`;
             }
@@ -284,12 +269,15 @@ export default {
         },
         async fetchData() {
             try {
+                
                 const response = await this.$axios.get(
-                    `/orders?pageNumber=${this.currentPage}&pageSize=10`
+                    `/orders?page=${this.currentPage}`
                 );
-                this.listorders = response.data.data;
+                this.listOrders = response.data.data;
+                // const user = await this.fetchData(this.listOrders.id);
+                // this.listOrders.nameCustomer = user.data.data.fullname;
                 this.meta = response.data.meta;
-                console.log(this.listorders);
+                console.log(this.listOrders);
             } catch (error) {
                 console.log(error);
                 this.notiAction = 'Tải';
@@ -312,12 +300,13 @@ export default {
             }
         },
         async Search() {
+            console.log('search');
             this.currentPage = this.pageParam;
             try {
-                const { currentPage, selectedOption, searchValue } = this;
-                let url = `/orders?pageNumber=${currentPage}&pageSize=10`;
-                if (selectedOption && selectedOption !== 'Tất cả') {
-                    url += `&ordersType=${selectedOption}`;
+                const { currentPage, permission, searchValue } = this;
+                let url = `/users?page=${currentPage}`;
+                if (permission && permission != '') {
+                    url += `&permission=${permission}`;
                 }
                 if (searchValue) {
                     url += `&searchQuery=${searchValue}`;
@@ -325,19 +314,19 @@ export default {
                 const {
                     data: { data, meta },
                 } = await this.$axios.get(url);
-                this.listorders = data;
+                this.listUsers = data;
                 this.meta = meta;
-                console.log(this.listorders);
-                // Lưu trạng thái của selectedOption và searchValue vào URL của trang web
+                console.log(this.listUsers);
+                // Lưu trạng thái của permission và searchValue vào URL của trang web
                 const query = {};
-                if (selectedOption) {
-                    query.type = selectedOption;
+                if (permission != '') {
+                    query.permission = permission;
                 }
                 if (searchValue) {
                     query.search = searchValue;
                 }
                 this.$router.push({
-                    path: `/orders?page=${currentPage}`,
+                    path: `/users?page=${currentPage}`,
                     query,
                 });
             } catch (error) {
@@ -351,7 +340,6 @@ export default {
                 }, 3000);
             }
         },
-        // debounce
         onSearchInput() {
             clearTimeout(this.timeoutId); // xóa bỏ setTimeout() trước đó (nếu có)
             this.timeoutId = setTimeout(() => {

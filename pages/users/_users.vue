@@ -11,18 +11,10 @@
             :type="'warning'"
             :action="notiAction"
             :object="notiObject"
-            v-show="isShowPopup == true"
+            v-show="isShowPopup"
             @closePopup="closePopup"
             @submitForm="submitForm"
         ></PopUp>
-        <CreateUser
-            :type="'update'"
-            :userProp="currentUser"
-            v-show="isShowPopup == 'thêm mới'"
-            @closePopup="closePopup"
-            @submitForm="submitForm"
-        >
-        </CreateUser>
         <Header class="page-top"></Header>
         <TabLeft @closeTab="closeTab()" @openTab="openTab()"></TabLeft>
         <div class="main-content">
@@ -42,21 +34,6 @@
                             src="../../static/icons/search.svg"
                             alt=""
                         />
-                    </div>
-                    <!-- <multiselect
-                        class="multiselect"
-                        :options="listPermission"
-                        v-model="permission"
-                        placeholder="Chọn hoặc tìm kiếm vai trò"
-                        @input="Search"
-                    ></multiselect> -->
-                    <div class="btn-container">
-                        <button
-                            class="create-btn"
-                            @click="isShowPopup = 'thêm mới'"
-                        >
-                            Thêm tài khoản
-                        </button>
                     </div>
                 </div>
 
@@ -150,11 +127,18 @@ export default {
         UserItem,
         CreateUser,
     },
+    // async asyncData({ $axios }) {
+    //     const { data } = await $axios.get(
+    //         `/users?page=${1}`
+    //     );
+    //     return {
+    //         listUsers: data.data
+    //     }
+    // },
     data() {
         return {
             UserID: '',
             searchValue: '',
-            listUsers: [],
             meta: [],
             currentPage: 1,
             isHaveContent: false,
@@ -166,6 +150,7 @@ export default {
             permission: '',
             listPermission: ['Quản trị viên', 'Nhân viên'],
             currentUser: {},
+            listUsers: []
         };
     },
     computed: {
@@ -180,7 +165,7 @@ export default {
         },
     },
     mounted() {
-        this.searchValue = this.pageSearch;
+        // this.searchValue = this.pageSearch;
         this.refreshData();
     },
     watch: {
@@ -191,7 +176,7 @@ export default {
             deep: true,
             immediate: true,
             handler(newVal) {
-                if (newVal.length > 0) {
+                if (newVal) {
                     this.isHaveContent = true;
                 } else {
                     this.isHaveContent = false;
@@ -200,11 +185,11 @@ export default {
         },
     },
     methods: {
-        refreshData() {
+        async refreshData() {
             if (this.searchValue !== '') {
-                this.Search();
+                await this.Search();
             } else {
-                this.fetchData();
+                await this.fetchData();
             }
         },
         async fetchData() {
@@ -230,11 +215,8 @@ export default {
             console.log('search');
             this.currentPage = this.pageParam;
             try {
-                const { currentPage, permission, searchValue } = this;
-                let url = `/users?pageNumber=${currentPage}&pageSize=10`;
-                if (permission && permission != '') {
-                    url += `&permission=${permission}`;
-                }
+                const { currentPage, searchValue } = this;
+                let url = `/users?page=${currentPage}`;
                 if (searchValue) {
                     url += `&searchQuery=${searchValue}`;
                 }
@@ -246,9 +228,6 @@ export default {
                 console.log(this.listUsers);
                 // Lưu trạng thái của permission và searchValue vào URL của trang web
                 const query = {};
-                if (permission != '') {
-                    query.permission = permission;
-                }
                 if (searchValue) {
                     query.search = searchValue;
                 }
@@ -274,37 +253,9 @@ export default {
                 this.Search();
             }, 700); // tạo mới setTimeout() với thời gian chờ là 700ms
         },
-        async addUser(user) {
-            try {
-                await this.$axios.post(`/users`, {
-                    userID: user.userID,
-                    username: user.username,
-                    password: user.password,
-                    fullName: user.fullName,
-                    userRole: user.userRole,
-                });
-                this.fetchData();
-                this.notiAction = 'Thêm mới';
-                this.notiObject = 'user';
-                this.notiType = 'thành công';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = '';
-                }, 3000);
-            } catch (error) {
-                this.notiAction = 'Thêm mới';
-                this.notiObject = 'user';
-                this.notiType = 'thất bại';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-                console.log(error);
-            }
-        },
         async deleteUser() {
             try {
-                await this.$axios.delete(`/users/${this.UserID}`);
+                await this.$axios.delete(`/users/${ this.id }`);
                 this.notiAction = 'Xóa';
                 this.notiObject = 'người dùng';
                 this.notiType = 'thành công';
@@ -387,17 +338,13 @@ export default {
                 .classList.remove('close-collapse');
         },
         showPopup(action, object, id) {
-            if (action == 'thêm mới') {
-                this.fetchDetail(id);
+            if (action == 'xóa') {
+                this.id = id;
                 this.isShowPopup = action;
-            } else if (action == 'xuất file') {
-                this.notiObject = object;
-                this.isShowPopup = true;
-            } else {
-                this.notiObject = object;
-                this.isShowPopup = true;
-                this.UserID = id;
-                console.log(id);
+            } else if (action == 'thêm mới') {
+                this.id = id;
+                this.fetchDetail(this.id)
+                this.isShowPopup = action;
             }
             this.notiAction = action;
         },
@@ -408,13 +355,7 @@ export default {
             if (action === 'xóa') {
                 this.deleteUser();
             } else if (action === 'thêm mới') {
-                if (!user.userID) {
-                    this.addUser(user);
-                } else {
-                    this.updateUser(user);
-                }
-            } else {
-                this.downloadFile();
+                this.updateUser(user);
             }
         },
         closePopup() {

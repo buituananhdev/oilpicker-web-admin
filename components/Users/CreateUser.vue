@@ -34,7 +34,7 @@
                         <input
                             type="text"
                             class="form-inp"
-                            v-model="currentUser.fullName"
+                            v-model="currentUser.fullname"
                             v-validate="'required|min:1|max:30'"
                             :class="{
                                 input: true,
@@ -46,145 +46,109 @@
                             errors.first('Họ và tên')
                         }}</span>
                     </div>
-                    <!-- <div class="status form-col">
+                    <div class="device-id form-col">
                         <p class="form-label">
-                            Chức vụ
+                            Địa chỉ
+                            <small style="color: #c7422e">*</small>
+                        </p>
+                        <input
+                            type="text"
+                            class="form-inp"
+                            v-model="currentUser.address"
+                            v-validate="'required|min:1|max:30'"
+                            :class="{
+                                input: true,
+                                'is-danger': errors.has('Địa chỉ'),
+                            }"
+                            name="Địa chỉ"
+                        />
+                        <span
+                            v-show="errors.has('Địa chỉ')"
+                            class="err"
+                            >{{ errors.first('Địa chỉ') }}</span
+                        >
+                    </div>
+                    <div class="device-id form-col">
+                        <p class="form-label">
+                            Số điện thoại <small style="color: #c7422e">*</small>
+                        </p>
+                        <input
+                            type="number"
+                            autocomplete="off"
+                            class="form-inp"
+                            v-model="currentUser.phonenumber"
+                            v-validate="'required|min:1|max:30'"
+                            :class="{
+                                input: true,
+                                'is-danger': errors.has('Số điện thoại'),
+                            }"
+                            name="Số điện thoại"
+                        />
+                        <span v-show="errors.has('Số điện thoại')" class="err">{{
+                            errors.first('Số điện thoại')
+                        }}</span>
+                    </div>
+                    <div class="device-id form-col">
+                        <p class="form-label">
+                            Email <small style="color: #c7422e">*</small>
+                        </p>
+                        <input
+                            type="text"
+                            autocomplete="off"
+                            class="form-inp"
+                            v-model="currentUser.email"
+                            v-validate="'required|min:1|max:30|password'"
+                            :class="{
+                                input: true,
+                                'is-danger': errors.has('Email'),
+                            }"
+                            name="Email"
+                        />
+                        <span v-show="errors.has('Email')" class="err">{{
+                            errors.first('Email')
+                        }}</span>
+                    </div>
+                    <div class="status form-col">
+                        <p class="form-label">
+                            Ngân hàng
                             <small style="color: #c7422e">*</small>
                         </p>
                         <multiselect
                             class="multiselect"
-                            :options="listType"
-                            v-model="currentUser.userRole"
+                            :options="listbanks"
+                            label="short-name"
+                            v-model="currentUser.a"
                             placeholder="Chọn chức vụ"
                             v-validate="'required'"
                             :class="{
                                 input: true,
-                                'is-danger': errors.has('Chức vụ'),
+                                'is-danger': errors.has('Ngân hàng'),
                             }"
-                            name="Chức vụ"
+                            name="Ngân hàng"
                         ></multiselect>
-                        <span v-show="errors.has('Chức vụ')" class="err">{{
-                            errors.first('Chức vụ')
-                        }}</span>
-                    </div> -->
-                    <div class="device-id form-col">
-                        <p class="form-label">
-                            Tên đăng nhập
-                            <small style="color: #c7422e">*</small>
-                        </p>
-                        <input
-                            type="text"
-                            class="form-inp"
-                            v-model="currentUser.username"
-                            v-validate="'required|min:1|max:30'"
-                            :class="{
-                                input: true,
-                                'is-danger': errors.has('Tên đăng nhập'),
-                            }"
-                            name="Tên đăng nhập"
-                        />
-                        <span
-                            v-show="errors.has('Tên đăng nhập')"
-                            class="err"
-                            >{{ errors.first('Tên đăng nhập') }}</span
-                        >
-                    </div>
-                    <div class="device-id form-col">
-                        <p class="form-label">
-                            Mật khẩu <small style="color: #c7422e">*</small>
-                        </p>
-                        <input
-                            type="text"
-                            autocomplete="off"
-                            v-if="isShowPass"
-                            class="form-inp"
-                            v-model="currentUser.password"
-                            v-validate="'required|min:1|max:30|password'"
-                            :class="{
-                                input: true,
-                                'is-danger': errors.has('Mật khẩu'),
-                            }"
-                            name="Mật khẩu"
-                        />
-                        <input
-                            type="password"
-                            autocomplete="off"
-                            v-else
-                            class="form-inp"
-                            v-model="currentUser.password"
-                            v-validate="'required|min:1|max:30|password'"
-                            :class="{
-                                input: true,
-                                'is-danger': errors.has('Mật khẩu'),
-                            }"
-                            name="Mật khẩu"
-                        />
-                        <img
-                            class="eye-icn"
-                            v-if="isShowPass"
-                            src="../../static/icons/eye-slash.svg"
-                            alt=""
-                            @click="isShowPass = !isShowPass"
-                        />
-                        <img
-                            class="eye-icn"
-                            v-else
-                            src="../../static/icons/eye.svg"
-                            alt=""
-                            @click="isShowPass = !isShowPass"
-                        />
-                        <span v-show="errors.has('Mật khẩu')" class="err">{{
-                            errors.first('Mật khẩu')
+                        <span v-show="errors.has('Ngân hàng')" class="err">{{
+                            errors.first('Ngân hàng')
                         }}</span>
                     </div>
                     <div class="device-id form-col">
                         <p class="form-label">
-                            Xác nhận mật khẩu
-                            <small style="color: #c7422e">*</small>
+                            Số tài khoản <small style="color: #c7422e">*</small>
                         </p>
                         <input
                             type="text"
-                            v-if="isShowConfirm"
+                            autocomplete="off"
                             class="form-inp"
-                            v-model="password"
-                            v-validate="'required|min:1|max:32|password'"
+                            v-model="currentUser.bankNumber"
+                            v-validate="'required|min:1|max:30|password'"
                             :class="{
                                 input: true,
-                                'is-danger': errors.has('Xác nhận mật khẩu'),
+                                'is-danger': errors.has('Số tài khoản'),
                             }"
-                            name="Xác nhận mật khẩu"
+                            name="Số tài khoản"
                         />
-                        <input
-                            v-else
-                            type="password"
-                            class="form-inp"
-                            v-model="password"
-                            v-validate="'required|min:1|max:32|password'"
-                            :class="{
-                                input: true,
-                                'is-danger': errors.has('Xác nhận mật khẩu'),
-                            }"
-                            name="Xác nhận mật khẩu"
-                        />
-                        <img
-                            class="eye-icn"
-                            v-if="isShowConfirm"
-                            src="../../static/icons/eye-slash.svg"
-                            alt=""
-                            @click="isShowConfirm = !isShowConfirm"
-                        />
-                        <img
-                            class="eye-icn"
-                            v-else
-                            src="../../static/icons/eye.svg"
-                            alt=""
-                            @click="isShowConfirm = !isShowConfirm"
-                        />
-                        <span
-                            v-show="errors.has('Xác nhận mật khẩu')"
-                            class="err"
-                            >{{ errors.first('Xác nhận mật khẩu') }}</span
-                        >
+                        <span v-show="errors.has('Số tài khoản')" class="err">{{
+                            errors.first('Số tài khoản')
+                        }}</span>
                     </div>
                 </div>
             </div>
@@ -215,7 +179,7 @@ export default {
             password: '',
             checkBtn: false,
             showNotification: false,
-            listType: ['Nhân viên', 'Quản trị viên'],
+            listbanks:[]
         };
     },
     watch: {
