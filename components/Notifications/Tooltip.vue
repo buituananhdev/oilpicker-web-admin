@@ -41,7 +41,7 @@
                 </svg>
                 Hủy thanh lý
             </div>
-            <div v-if="type != 'organization' && type != 'room'" class="button delete" @click="$emit('delete')">
+            <div v-if="type != 'organization' && type != 'Bill'" class="button delete" @click="$emit('delete')">
                 <svg
                     class="delete-icn"
                     xmlns="http://www.w3.org/2000/svg"

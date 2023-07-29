@@ -3,24 +3,36 @@
         <div class="item div-center">
             <p
                 class="div-center stt-col"
-                @click="$router.push(`/rooms?page=1&organization_id=${itemProp.organizationID}`)"
+                @click="$router.push(`/Bills?page=1&organization_id=${itemProp.organizationID}`)"
             >
                 {{ itemIndex }}
             </p>
             <p
-                class="div-center organization-name-col"
-                @click="$router.push(`/rooms?page=1&organization_id=${itemProp.organizationID}`)"
+                class="div-center name-col"
+                @click="$router.push(`/Bills?page=1&organization_id=${itemProp.organizationID}`)"
             >
-                {{ itemProp.organizationName }}
+                {{ itemProp.name }}
             </p>
             <p
-                class="div-center organization-type-col"
-                @click="$router.push(`/rooms?page=1&organization_id=${itemProp.organizationID}`)"
+            class="div-center price-col"
+            @click="$router.push(`/Bills?page=1&organization_id=${itemProp.organizationID}`)"
             >
-                {{ itemProp.organizationType }}
+            {{ itemProp.price }}
+            </p>
+            <p
+                class="div-center available-col"
+                @click="$router.push(`/Bills?page=1&organization_id=${itemProp.organizationID}`)"
+            >
+                {{ itemProp.available }}
+            </p>
+            <p
+                class="div-center sold-col"
+                @click="$router.push(`/Bills?page=1&organization_id=${itemProp.organizationID}`)"
+            >
+                {{ itemProp.sold }}
             </p>
             <span
-                class="div-center show-action-col"
+                class="div-center show-action-col tool-col"
                 @mouseover="showAction()"
                 @mouseleave="hideAction()"
             >
@@ -31,15 +43,15 @@
                     :type="type"
                     @mouseover="showAction()"
                     @delete="
-                        $emit('showPopup', 'xóa', 'tổ chức', itemProp.organizationID)
+                        $emit('showPopup', 'xóa', 'dầu', itemProp.organizationID)
                     "
                     @dispose="
-                        $emit('showPopup', 'thanh lý', 'tổ chức', itemProp.organizationID)
+                        $emit('showPopup', 'thanh lý', 'dầu', itemProp.organizationID)
                     "
                     @update="
-                        $emit('showPopup', 'thêm mới', 'tổ chức', itemProp.organizationID)
+                        $emit('showPopup', 'thêm mới', 'dầu', itemProp.organizationID)
                     "
-                    @cancel_dispose="$emit('showPopup', 'hủy thanh lý', 'tổ chức', itemProp.organizationID)"
+                    @cancel_dispose="$emit('showPopup', 'hủy thanh lý', 'dầu', itemProp.organizationID)"
                 ></Tooltip>
             </span>
         </div>
@@ -103,5 +115,23 @@ export default {
 }
 .evenLine {
     background: #dfe0eb;
+}
+.stt-col{
+    width: 10%;
+}
+.name-col{
+    width: 30%;
+}
+.price-col{
+    width: 25%;
+}
+.tool-col{
+    width: 5%;
+}
+.available-col{
+    width: 15%;
+}
+.sold-col{
+    width: 15%;
 }
 </style>

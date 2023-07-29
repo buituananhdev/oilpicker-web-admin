@@ -1,20 +1,24 @@
 <template>
     <div class="main" :class="{ evenLine: itemIndex % 2 == 0 }">
         <div class="item div-center">
-            <p class="div-center stt-user-col">
+            <p class="div-center stt-col">
                 {{ itemIndex }}
             </p>
-            <p class="div-center account-col">
-                {{ itemProp.username }}
-            </p>
-            <p class="div-center name-user-col">
+            <p class="div-center name-col">
                 {{ itemProp.fullName }}
             </p>
-            <p class="div-center roll-col">
-                {{ itemProp.userRole }}
+            <p class="div-center email-col">
+                {{ itemProp.email }}
             </p>
-            <span
-                class="div-center show-action-user-col"
+            <p class="div-center address-col">
+                {{ itemProp.address }}
+            </p>
+            <p class="div-center phone-number-col">
+                {{ itemProp.phoneNumber }}
+            </p>
+
+            <div 
+                class="div-center tool-col"
                 @mouseover="showAction()"
                 @mouseleave="hideAction()"
             >
@@ -37,7 +41,7 @@
                         )
                     "
                 ></Tooltip>
-            </span>
+            </div >
         </div>
     </div>
 </template>
@@ -56,7 +60,7 @@ export default {
         },
     },
     created() {
-        this.Username = localStorage.getItem('currentUsername');
+        //this.Username = localStorage.getItem('currentUsername');
     },
     methods: {
         showAction() {
@@ -96,12 +100,29 @@ export default {
 }
 .item p {
     font-size: 15px;
-    width: calc(100% / 5);
 }
 .item:hover .custom-select-trigger {
     color: #008cde;
 }
 .evenLine {
     background: #dfe0eb;
+}
+.stt-col{
+    width: 10%;
+}
+.name-col{
+    width: 25%;
+}
+.email-col{
+    width: 20%;
+}
+.address-col{
+    width: 20%;
+}
+.phone-number-col{
+    width: 20%;
+}
+.tool-col{
+    width: 5%;
 }
 </style>

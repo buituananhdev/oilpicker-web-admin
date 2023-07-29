@@ -11,24 +11,24 @@
             :type="'warning'"
             :action="notiAction"
             :object="notiObject"
-            v-show="isShowPopup == true"
+            v-if="isShowPopup ==  true"
             @closePopup="closePopup"
             @submitForm="submitForm"
         ></PopUp>
-        <CreateAsset
+        <CreateOil
             :type="'update'"
-            :assetProp="currentAsset"
-            v-show="isShowPopup === 'thêm mới'"
+            :organizationProp="currentOrganization"
+            v-if="isShowPopup === 'thêm mới'"
             @closePopup="closePopup"
             @submitForm="submitForm"
         >
-        </CreateAsset>
+        </CreateOil>
         <Header class="page-top"></Header>
         <TabLeft @closeTab="closeTab()" @openTab="openTab()"></TabLeft>
         <div class="main-content">
             <div class="page-main">
-                <h1 class="page-main-title">Danh sách tài sản</h1>
-                <div class="action-container">
+                <h1 class="page-main-title">Danh sách dầu</h1>
+                <!-- <div class="action-container">
                     <div class="search">
                         <input
                             type="text"
@@ -47,15 +47,7 @@
                         class="multiselect"
                         :options="options"
                         v-model="selectedOption"
-                        placeholder="Trạng thái của tài sản"
-                        @input="Search"
-                    ></multiselect>
-                    <multiselect
-                        class="multiselect"
-                        :options="listRooms"
-                        v-model="selectedRoom"
-                        label="roomName"
-                        placeholder="Tìm kiếm hoặc chọn phòng"
+                        placeholder="Loại tổ chức"
                         @input="Search"
                     ></multiselect>
                     <div class="btn-container">
@@ -69,22 +61,26 @@
                             class="create-btn"
                             @click="isShowPopup = 'thêm mới'"
                         >
-                            Thêm tài sản
+                            Thêm dầu
                         </button>
                     </div>
-                </div>
-                <div class="table-assets">
+                </div> -->
+                <!-- <div class="table-assets">
                     <span class="table-assets-title div-center">
                         <p class="div-center stt-col">STT</p>
-                        <p class="div-center device-id-col">Mã số TB</p>
                         <p class="div-center name-col">
-                            Tên tài sản cố định, CC, DC và đồ gỗ ...
+                            Tên dầu
                         </p>
-                        <p class="div-center year-used-col">Năm sử dụng</p>
-                        <p class="div-center quantity-col">Số lượng</p>
-                        <p class="div-center cost-col">Thành tiền</p>
-                        <p class="div-center status-col">Trạng thái</p>
-                        <p class="div-center show-action-col">Action</p>
+                        <p class="div-center price-col">
+                            Giá dầu
+                        </p>
+                        <p class="div-center available-col">
+                            Lượng dầu còn
+                        </p>
+                        <p class="div-center sold-col">
+                            Lượng dầu đã bán
+                        </p>
+                        <p class="tool-col"></p>
                     </span>
                     <div class="empty-icn div-center" v-show="!isHaveContent">
                         <img
@@ -93,15 +89,21 @@
                         />
                         <h1 class="empty-err-mess">Không có dữ liệu</h1>
                     </div>
-                    <AssetItem
-                        v-for="(item, index) in listAssets"
-                        :type="'asset'"
+                    <OilItem
+                        v-for="(item, index) in listOrganizations"
+                        :type="'organization'"
                         :key="index"
                         :itemProp="item"
                         :itemIndex="index + 1"
                         @showPopup="showPopup"
                         style="width: 100%"
-                    ></AssetItem>
+                    ></OilItem>
+                </div> -->
+                <div class="table-assets container">
+                    <div class="box">
+                        <div>Giá</div>
+                        <div></div>
+                    </div>
                 </div>
                 <div class="pagination">
                     <div
@@ -160,21 +162,36 @@
 </template>
 
 <script>
-import AssetItem from '@/components/Asset/AssetItem.vue';
+import OilItem from '@/components/Oil/OilItem.vue';
+import CreateOil from '@/components/Oil/CreateOil.vue';
 export default {
     components: {
-        AssetItem,
+        OilItem,
+        CreateOil,
     },
     data() {
         return {
-            listAssets: [],
+            listOrganizations: [
+                {
+                    id: '6a386c58-dd12-44b8',
+                    name: 'abc',
+                    price: '20000',
+                    available: '200',
+                    sold: '1000'
+                },
+                {
+                    id: '6a386c58-dd12-44b8',
+                    name: 'abcddd',
+                    price: '20000',
+                    available: '200',
+                    sold: '1000'
+                },
+            ],
             meta: [],
             currentPage: 1,
-            assetID: {},
-            listRooms: [],
-            selectedRoom: '',
+            organizationID: {},
             isHaveContent: false,
-            isShowPopup: false,
+            isShowPopup: '',
             showNotification: false,
             notiAction: '',
             notiObject: '',
@@ -182,12 +199,8 @@ export default {
             searchValue: '',
             timeoutId: null, // thêm biến timeoutId vào component
             selectedOption: '',
-            currentAsset: {},
-            options: [
-                'Hoạt động tốt',
-                'Hư hỏng, cần được sửa chữa',
-                'Đang bảo dưỡng',
-            ],
+            currentOrganization: {},
+            options: ['Tất cả', 'Khoa', 'Phòng ban', 'Trung tâm'],
         };
     },
     computed: {
@@ -197,29 +210,28 @@ export default {
         pageSearch() {
             return this.$route.query.search;
         },
-        pageStatus() {
-            return this.$route.query.status;
+        pageType() {
+            return this.$route.query.type;
         },
-        pageRoom() {
-            return this.$route.query.room_id;
-        }
     },
     mounted() {
-        this.roomID = this.pageRoom;
-        this.searchValue = this.pageSearch;
-        this.selectedOption = this.pageStatus;
-        this.roomID = this.pageRoom;
-        if(this.roomID != undefined) {
-            this.fetchDetailRoom();
-        }
-        this.refreshData();
-        this.fetchListRooms();
+        // this.searchValue = this.pageSearch;
+        // this.selectedOption = this.pageType;
+        // if (this.searchValue !== '' || this.selectedOption !== '') {
+        //     this.Search();
+        // } else {
+        //     this.fetchData();
+        // }
     },
     watch: {
         pageParam: async function () {
-            this.refreshData();
+            if (this.searchValue !== '' || this.selectedOption !== '') {
+                this.Search();
+            } else {
+                this.fetchData();
+            }
         },
-        listAssets: {
+        listOrganizations: {
             deep: true,
             immediate: true,
             handler(newVal) {
@@ -232,26 +244,16 @@ export default {
         },
     },
     methods: {
-        refreshData() {
-            if (this.searchValue !== '' || this.selectedOption !== '' || this.selectedRoom) {
-                this.Search();
-            } else {
-                this.fetchData();
-            }
-        },
         async downloadFile() {
+            const { selectedOption, searchValue } = this;
+            let apiURL = `/organizations?pageNumber=1&pageSize=10&isConvert=true`;
+            if (selectedOption && selectedOption !== 'Tất cả') {
+                apiURL += `&organizationType=${selectedOption}`;
+            }
+            if (searchValue) {
+                apiURL += `&searchQuery=${searchValue}`;
+            }
             try {
-                const { selectedOption, searchValue, selectedRoom } = this;
-                let apiURL = '/assets?pageNumber=1&pageSize=10&isConvert=true'; // đường dẫn tới API download file
-                if (selectedOption && selectedOption !== 'Tất cả') {
-                    apiURL += `&status=${selectedOption}`;
-                }
-                if (searchValue) {
-                    apiURL += `&searchQuery=${searchValue}`;
-                }
-                if(selectedRoom) {
-                    apiURL += `&room_id=${selectedRoom.roomID}`;
-                }
                 const response = await this.$axios({
                     method: 'get',
                     url: apiURL,
@@ -264,18 +266,22 @@ export default {
                 // Tạo một thẻ a để kích hoạt tải xuống tệp
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', 'SoTheoDoiTSCD.xlsx');
+                link.setAttribute('download', 'SoTheoDoiToChuc.xlsx');
                 document.body.appendChild(link);
                 link.click();
                 // Xóa đối tượng thẻ a để tránh hiển thị thừa trên trang
                 document.body.removeChild(link);
-                this.setNotification('Export', 'file', 'thành công');
+                this.notiAction = 'Export';
+                this.notiObject = 'file';
+                this.notiType = 'thành công';
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
                 }, 3000);
             } catch (error) {
-                this.setNotification('Export', 'file', 'thất bại');
+                this.notiAction = 'Export';
+                this.notiObject = 'file';
+                this.notiType = 'thất bại';
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
@@ -285,14 +291,16 @@ export default {
         async fetchData() {
             try {
                 const response = await this.$axios.get(
-                    `/assets?pageNumber=${this.currentPage}&pageSize=10`
+                    `/organizations?pageNumber=${this.currentPage}&pageSize=10`
                 );
-                this.listAssets = response.data.data;
+                this.listOrganizations = response.data.data;
                 this.meta = response.data.meta;
-                console.log(this.listAssets);
+                console.log(this.listOrganizations);
             } catch (error) {
                 console.log(error);
-                this.setNotification('Tải', 'dữ liệu', 'thất bại');
+                this.notiAction = 'Tải';
+                this.notiObject = 'dữ liệu';
+                this.notiType = 'thất bại';
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
@@ -301,60 +309,48 @@ export default {
         },
         async fetchDetail(id) {
             try {
-                await this.$axios.get(`/assets/${id}`).then((res) => {
-                    this.currentAsset = res['data']['data'];
-                    console.log(this.currentAsset);
+                await this.$axios.get(`/organizations/${id}`).then((res) => {
+                    this.currentOrganization = res['data']['data'];
+                    console.log(this.currentOrganization);
                 });
             } catch (error) {
-                this.setNotification('Tải', 'dữ liệu', 'thất bại');
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
                 console.log(error);
             }
         },
         async Search() {
             this.currentPage = this.pageParam;
             try {
-                const { currentPage, selectedOption, searchValue, selectedRoom, roomID } = this;
-                let url = `/assets?pageNumber=${currentPage}&pageSize=10`;
+                const { currentPage, selectedOption, searchValue } = this;
+                let url = `/organizations?pageNumber=${currentPage}&pageSize=10`;
                 if (selectedOption && selectedOption !== 'Tất cả') {
-                    url += `&status=${selectedOption}`;
+                    url += `&organizationType=${selectedOption}`;
                 }
                 if (searchValue) {
                     url += `&searchQuery=${searchValue}`;
                 }
-                if(selectedRoom) {
-                    url += `&room_id=${selectedRoom.roomID}`;
-                }
-                if(selectedRoom === '' && roomID) {
-                    url += `&room_id=${roomID}`;
-                }
                 const {
                     data: { data, meta },
                 } = await this.$axios.get(url);
-                this.listAssets = data;
+                this.listOrganizations = data;
                 this.meta = meta;
-                console.log(this.listAssets);
+                console.log(this.listOrganizations);
                 // Lưu trạng thái của selectedOption và searchValue vào URL của trang web
                 const query = {};
                 if (selectedOption) {
-                    query.status = selectedOption;
+                    query.type = selectedOption;
                 }
                 if (searchValue) {
                     query.search = searchValue;
                 }
-                if (selectedRoom) {
-                    query.room_id = selectedRoom.roomID;
-                }
-                if(selectedRoom === '') {
-                    query.room_id = roomID;
-                }
-                this.$router.push({ path: `/assets?page=${currentPage}`, query });
+                this.$router.push({
+                    path: `/organizations?page=${currentPage}`,
+                    query,
+                });
             } catch (error) {
                 console.error(error);
-                this.setNotification('Tải', 'dữ liệu', 'thất bại');
+                this.notiAction = 'Tải';
+                this.notiObject = 'dữ liệu';
+                this.notiType = 'thất bại';
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
@@ -368,27 +364,25 @@ export default {
                 this.Search();
             }, 700); // tạo mới setTimeout() với thời gian chờ là 700ms
         },
-        async addAsset(asset) {
+        async addOrganization(organization) {
             try {
-                await this.$axios.post(`/assets`, {
-                    deviceID: asset.deviceID,
-                    roomID: asset.roomID,
-                    assetName: asset.assetName,
-                    yearOfUse: 2023,
-                    technicalSpecification: asset.technicalSpecification,
-                    quantity: asset.quantity,
-                    cost: asset.cost,
-                    status: 'Hoạt động tốt',
-                    notes: asset.notes,
+                await this.$axios.post(`/organizations`, {
+                    organizationID: '',
+                    organizationName: organization.organizationName,
+                    organizationType: organization.organizationType,
                 });
-                this.setNotification('Thêm mới', 'tài sản', 'thành công');
+                this.fetchData();
+                this.notiAction = 'Thêm mới';
+                this.notiObject = 'tổ chức';
+                this.notiType = 'thành công';
                 this.showNotification = true;
-                this.refreshData();
                 setTimeout(() => {
                     this.showNotification = '';
                 }, 3000);
             } catch (error) {
-                this.setNotification('Thêm mới', 'tài sản', 'thất bại');
+                this.notiAction = 'Thêm mới';
+                this.notiObject = 'tổ chức';
+                this.notiType = 'thất bại';
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
@@ -396,64 +390,52 @@ export default {
                 console.log(error);
             }
         },
-        async updateAsset(asset) {
+        async updateOrganization(organization) {
             try {
-                await this.$axios.put(`/assets/${asset.assetID}`, {
-                    assetID: asset.assetID,
-                    deviceID: asset.deviceID,
-                    roomID: asset.roomID,
-                    assetName: asset.assetName,
-                    yearOfUse: 2023,
-                    technicalSpecification: asset.technicalSpecification,
-                    quantity: asset.quantity,
-                    cost: asset.cost,
-                    status: asset.status,
-                    notes: asset.notes,
-                });
-                this.setNotification('Cập nhật', 'tài sản', 'thành công');
+                await this.$axios.put(
+                    `/organizations/${organization.organizationID}`,
+                    {
+                        organizationID: organization.organizationID,
+                        organizationName: organization.organizationName,
+                        organizationType: organization.organizationType,
+                    }
+                );
+                this.fetchData();
+                this.notiAction = 'Cập nhật';
+                this.notiObject = 'tổ chức';
+                this.notiType = 'thành công';
                 this.showNotification = true;
-                this.refreshData();
                 setTimeout(() => {
                     this.showNotification = false;
                 }, 3000);
             } catch (error) {
-                this.setNotification('Cập nhật', 'tài sản', 'thất bại');
+                this.notiAction = 'Cập nhật';
+                this.notiObject = 'tổ chức';
+                this.notiType = 'thất bại';
                 this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-                console.log(error);
-            }
-        },
-        async deleteAsset() {
-            try {
-                await this.$axios.delete(`/assets/${this.assetID}`);
-                this.setNotification('Xóa', 'tài sản', 'thành công');
-                this.showNotification = true;
-                this.refreshData();
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-            } catch (error) {
-                this.setNotification('Xóa', 'tài sản', 'thất bại');
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-                console.log(error);
-            }
-        },
-        async disposeAsset() {
-            try {
-                await this.$axios.post(`/assets/${this.assetID}`);
-                this.setNotification('Thanh lý', 'tài sản', 'thành công');
-                this.showNotification = true;
-                this.refreshData();
                 setTimeout(() => {
                     this.showNotification = '';
                 }, 3000);
+                console.log(error);
+            }
+        },
+        async deleteOrganization() {
+            try {
+                await this.$axios.delete(
+                    `/organizations/${this.organizationID}`
+                );
+                this.notiAction = 'Xóa';
+                this.notiObject = 'tổ chức';
+                this.notiType = 'thành công';
+                this.showNotification = true;
+                setTimeout(() => {
+                    this.showNotification = false;
+                }, 3000);
+                this.fetchData();
             } catch (error) {
-                this.setNotification('Thanh lý', 'tài sản', 'thất bại');
+                this.notiAction = 'Xóa';
+                this.notiObject = 'tổ chức';
+                this.notiType = 'thất bại';
                 this.showNotification = true;
                 setTimeout(() => {
                     this.showNotification = false;
@@ -472,31 +454,6 @@ export default {
             document
                 .querySelector('.page-top')
                 .classList.remove('open-collapse');
-        },
-        async fetchListRooms() {
-            try {
-                const response = await this.$axios.get(`/rooms`);
-                this.listRooms = response.data.data;
-            } catch (error) {
-                console.log(error);
-            }
-        },
-        async fetchDetailRoom() {
-            try {
-                await this.$axios
-                    .get(`/rooms/${this.roomID}`)
-                    .then((res) => {
-                        this.selectedRoom = res['data']['data'];
-                        console.log(this.selectedRoom);
-                    });
-            } catch (error) {
-                console.log(error);
-            }
-        },
-        setNotification(action, object, type) {
-            this.notiAction = action;
-            this.notiObject = object;
-            this.notiType = type;
         },
         openTab() {
             document
@@ -519,24 +476,21 @@ export default {
                 this.isShowPopup = true;
             } else {
                 this.isShowPopup = true;
-                this.assetID = id;
-                this.notiObject = object;
+                this.organizationID = id;
+                console.log(id);
             }
             this.notiAction = action;
         },
-        submitForm(action, asset) {
+        submitForm(action, organization) {
             console.log(action);
-            console.log(asset);
             this.isShowPopup = false;
             if (action === 'xóa') {
-                this.deleteAsset();
-            } else if (action === 'thanh lý') {
-                this.disposeAsset();
+                this.deleteOrganization();
             } else if (action === 'thêm mới') {
-                if (!asset.assetID) {
-                    this.addAsset(asset);
+                if (!organization.organizationID) {
+                    this.addOrganization(organization);
                 } else {
-                    this.updateAsset(asset);
+                    this.updateOrganization(organization);
                 }
             } else {
                 this.downloadFile();
@@ -544,7 +498,7 @@ export default {
         },
         closePopup() {
             this.isShowPopup = '';
-            this.currentAsset = {};
+            this.currentOrganization = {};
         },
         goToIndexPage() {
             const query = {};
@@ -570,3 +524,37 @@ export default {
 </script>
 
 <style scoped src="../../static/css/table_assets.css"></style>
+
+<style scoped>
+.stt-col{
+    width: 10%;
+}
+.name-col{
+    width: 30%;
+}
+.available-col{
+    width: 15%;
+}
+.sold-col{
+    width: 15%;
+}
+.price-col{
+    width: 25%;
+}
+.tool-col{
+    width: 5%;
+}
+.container{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    width: 100%;
+}
+.box{
+    border: 2px solid rgb(186, 186, 186);
+    padding: 10px;
+    width: calc((100%-10px)/2);
+    height: 70px;
+    border-radius: 10px;
+}
+</style>

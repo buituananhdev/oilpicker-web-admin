@@ -16,70 +16,69 @@
                 />
                 <h1
                     class="popup-title"
-                    v-if="JSON.stringify(roomProp) === '{}'"
+                    v-if="JSON.stringify(organizationProp) === '{}'"
                 >
-                    Thêm phòng
+                    Thêm tổ chức
                 </h1>
-                <h1 class="popup-title" v-else>Cập nhật phòng</h1>
+                <h1 class="popup-title" v-else>Cập nhật tổ chức</h1>
                 <div class="form-container">
-                    <div class="device-id form-col" v-if="JSON.stringify(roomProp) === '{}'">
+                    <!-- <div class="device-id form-col">
                         <p class="form-label">
-                            Mã phòng <small style="color: #c7422e">*</small>
+                            Mã tổ chức <small style="color: #c7422e">*</small>
                         </p>
                         <input
                             type="text"
                             class="form-inp"
-                            v-model="currentRoom.roomID"
+                            v-model="currentOrganization.organizationID"
                             v-validate="'required|min:1|max:30'"
                             :class="{
                                 input: true,
-                                'is-danger': errors.has('Mã phòng'),
+                                'is-danger': errors.has('Mã tổ chức'),
                             }"
-                            name="Mã phòng"
+                            name="Mã tổ chức"
                         />
-                        <span v-show="errors.has('Mã phòng')" class="err">{{
-                            errors.first('Mã phòng')
+                        <span v-show="errors.has('Mã tổ chức')" class="err">{{
+                            errors.first('Mã tổ chức')
                         }}</span>
-                    </div>
+                    </div> -->
                     <div class="device-id form-col">
                         <p class="form-label">
-                            Tên phòng <small style="color: #c7422e">*</small>
+                            Tên tổ chức <small style="color: #c7422e">*</small>
                         </p>
                         <input
                             type="text"
                             class="form-inp"
-                            v-model="currentRoom.roomName"
+                            v-model="currentOrganization.organizationName"
                             v-validate="'required|min:1|max:30'"
                             :class="{
                                 input: true,
-                                'is-danger': errors.has('Tên phòng'),
+                                'is-danger': errors.has('Tên tổ chức'),
                             }"
-                            name="Tên phòng"
+                            name="Tên tổ chức"
                         />
-                        <span v-show="errors.has('Tên phòng')" class="err">{{
-                            errors.first('Tên phòng')
+                        <span v-show="errors.has('Tên tổ chức')" class="err">{{
+                            errors.first('Tên tổ chức')
                         }}</span>
                     </div>
                     <div class="status form-col">
                         <p class="form-label">
-                            Tổ chức
+                            Loại tổ chức
                             <small style="color: #c7422e">*</small>
                         </p>
                         <multiselect
                             class="multiselect"
-                            :options="listOrganizations"
-                            v-model="currentRoom.organizationID"
-                            label="organizationName"
-                            placeholder="Chọn hoặc tìm kiếm tổ chức"
+                            :options="listType"
+                            v-model="currentOrganization.organizationType"
+                            placeholder="Chọn loại tổ chức"
                             v-validate="'required'"
                             :class="{
                                 input: true,
-                                'is-danger': errors.has('Tổ chức'),
+                                'is-danger': errors.has('Loại tổ chức'),
                             }"
-                            name="Tổ chức"
+                            name="Loại tổ chức"
                         ></multiselect>
-                        <span v-show="errors.has('Tổ chức')" class="err">{{
-                            errors.first('Tổ chức')
+                        <span v-show="errors.has('Loại tổ chức')" class="err">{{
+                            errors.first('Loại tổ chức')
                         }}</span>
                     </div>
                 </div>
@@ -102,29 +101,33 @@
 
 <script>
 export default {
-    props: ['type', 'content', 'roomProp', 'listOrganizations'],
+    props: ['type', 'content', 'organizationProp'],
     data() {
         return {
-            currentRoom: {},
-            listRooms: [],
+            currentOrganization: {},
+            status: '',
+            listBills: [],
             checkBtn: false,
             showNotification: false,
             listType: ['Khoa', 'Phòng ban', 'Trung tâm'],
         };
     },
     watch: {
-        roomProp(newValue) {
-            this.currentRoom = newValue;
-            var tmp = this.listOrganizations.find(obj => obj.organizationID === this.currentRoom.organizationID);
-            this.currentRoom.organizationID = tmp;
+        organizationProp(newValue) {
+            this.currentOrganization = newValue;
+            this.status = newValue.status;
+        },
+        status(newVal) {
+            this.currentOrganization.status = this.status;
+            console.log(this.currentOrganization);
         },
     },
     methods: {
         async submitForm() {
             const result = await this.$validator.validateAll();
             if (result) {
-                this.$emit('submitForm', 'thêm mới', this.currentRoom);
-                this.currentRoom = {};
+                this.$emit('submitForm', 'thêm mới', this.currentOrganization);
+                console.log(this.currentOrganization);
             } else {
                 this.showNotification = true;
                 setTimeout(() => {
@@ -141,7 +144,7 @@ export default {
 <style scoped src="../../static/css/popup.css"></style>
 <style scoped>
 .popup-form {
-    width: 500px;
+    width: 550px;
     padding: 32px 24px 32px 24px;
     flex-direction: column;
     justify-content: flex-start;

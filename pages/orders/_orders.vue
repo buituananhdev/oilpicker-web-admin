@@ -11,23 +11,23 @@
             :type="'warning'"
             :action="notiAction"
             :object="notiObject"
-            v-show="isShowPopup == true"
+            v-if="isShowPopup ==  true"
             @closePopup="closePopup"
             @submitForm="submitForm"
         ></PopUp>
-        <CreateUser
+        <!-- <CreateOrder
             :type="'update'"
-            :userProp="currentUser"
-            v-show="isShowPopup == 'thêm mới'"
+            :ordersProp="currentOrders"
+            v-if="isShowPopup === 'thêm mới'"
             @closePopup="closePopup"
             @submitForm="submitForm"
         >
-        </CreateUser>
+        </CreateOrder> -->
         <Header class="page-top"></Header>
         <TabLeft @closeTab="closeTab()" @openTab="openTab()"></TabLeft>
         <div class="main-content">
             <div class="page-main">
-                <h1 class="page-main-title">Danh sách tài khoản</h1>
+                <h1 class="page-main-title">Danh sách đơn đặt hàng</h1>
                 <div class="action-container">
                     <div class="search">
                         <input
@@ -45,30 +45,43 @@
                     </div>
                     <!-- <multiselect
                         class="multiselect"
-                        :options="listPermission"
-                        v-model="permission"
-                        placeholder="Chọn hoặc tìm kiếm vai trò"
+                        :options="options"
+                        v-model="selectedOption"
+                        placeholder="Loại tổ chức"
                         @input="Search"
                     ></multiselect> -->
                     <div class="btn-container">
-                        <button
+                        <!-- <button
+                            class="create-btn"
+                            @click="showPopup('xuất file', 'bảng dữ liệu')"
+                        >
+                            Xuất file excel
+                        </button> -->
+                        <!-- <button
                             class="create-btn"
                             @click="isShowPopup = 'thêm mới'"
                         >
-                            Thêm tài khoản
-                        </button>
+                            Thêm dầu
+                        </button> -->
                     </div>
                 </div>
-
                 <div class="table-assets">
-                    <div class="table-assets-title div-center">
+                    <span class="table-assets-title div-center">
                         <p class="div-center stt-col">STT</p>
-                        <p class="div-center name-col">Họ và tên</p>
-                        <p class="div-center email-col">Email</p>
-                        <p class="div-center address-col">Địa chỉ</p>
-                        <p class="div-center phone-number-col">Số điện thoại</p>
-                        <div class="div-center tool-col"></div>
-                    </div>
+                        <p class="div-center day-col">
+                            Ngày đặt
+                        </p>
+                        <p class="div-center type-col">
+                            Loại đơn
+                        </p>
+                        <p class="div-center appoint-day-col">
+                            Ngày hẹn lấy
+                        </p>
+                        <p class="div-center appoint-time-col">
+                            Thời gian hẹn
+                        </p>
+                        <p class="tool-col"></p>
+                    </span>
                     <div class="empty-icn div-center" v-show="!isHaveContent">
                         <img
                             src="../../static/icons/file-question.svg"
@@ -76,15 +89,15 @@
                         />
                         <h1 class="empty-err-mess">Không có dữ liệu</h1>
                     </div>
-                    <UserItem
-                        v-for="(item, index) in listUsers"
-                        :type="'user'"
+                    <OrderItem
+                        v-for="(item, index) in listorders"
+                        :type="'orders'"
                         :key="index"
                         :itemProp="item"
                         :itemIndex="index + 1"
                         @showPopup="showPopup"
                         style="width: 100%"
-                    ></UserItem>
+                    ></OrderItem>
                 </div>
                 <div class="pagination">
                     <div
@@ -143,54 +156,45 @@
 </template>
 
 <script>
-import CreateUser from '@/components/Users/CreateUser.vue';
-import UserItem from '@/components/Users/userItem.vue';
+import OrderItem from '@/components/Order/OrderItem.vue';
+import CreateOrder from '@/components/Order/CreateOrder.vue';
 export default {
     components: {
-        UserItem,
-        CreateUser,
+        OrderItem,
+        CreateOrder,
     },
     data() {
         return {
-            UserID: '',
-            searchValue: '',
-            listUsers: [
+            listorders: [
                 {
-                    id: '6a386c58-dd12-44b8',
-                    address: 'abc',
-                    bankId: '970422',
-                    bankNumber: '068866789999',
-                    email: 'anhanh2003+3@gmail.com',
-                    fullName: 'Bui Tuan Anh',
-                    password: '$2b',
-                    phoneNumber: '0342973670',
-                    qrcodeURL: 'https://storage.googleapis.com/oil-picker-project.appspot.com/qr_codes/qr_code_1690124695580.png',
-                    role: 'client'
+                    user_id: '6a386c58-dd12-44b8',
+                    order_date: 'abc',
+                    order_type: 'Lấy liền',
+                    recurring_day_of_week: '',
+                    recurring_time: ''
                 },
                 {
-                    id: '6a386c58-dd12-44b8',
-                    address: 'abc',
-                    bankId: '970422',
-                    bankNumber: '068866789999',
-                    email: 'anhanh2003+3@gmail.com',
-                    fullName: 'Bui Tuan Anh',
-                    password: '$2b',
-                    phoneNumber: '0342973670',
-                    qrcodeURL: 'https://storage.googleapis.com/oil-picker-project.appspot.com/qr_codes/qr_code_1690124695580.png',
-                    role: 'client'
-                }
+                    user_id: '6a386c58-dd12-44b8',
+                    order_date: 'abc',
+                    order_type: 'Đặt lịch',
+                    recurring_day_of_week: '1000',
+                    recurring_time: '10'
+                },
             ],
             meta: [],
             currentPage: 1,
+            ordersID: {},
             isHaveContent: false,
-            isShowPopup: false,
+            isShowPopup: '',
             showNotification: false,
             notiAction: '',
             notiObject: '',
             notiType: '',
-            permission: '',
-            listPermission: ['Quản trị viên', 'Nhân viên'],
-            currentUser: {},
+            searchValue: '',
+            timeoutId: null, // thêm biến timeoutId vào component
+            selectedOption: '',
+            currentOrders: {},
+            options: ['Tất cả', 'Khoa', 'Phòng ban', 'Trung tâm'],
         };
     },
     computed: {
@@ -200,19 +204,28 @@ export default {
         pageSearch() {
             return this.$route.query.search;
         },
-        pagePermission() {
-            return this.$route.query.permission;
+        pageType() {
+            return this.$route.query.type;
         },
     },
     mounted() {
-        this.searchValue = this.pageSearch;
-        this.refreshData();
+        // this.searchValue = this.pageSearch;
+        // this.selectedOption = this.pageType;
+        // if (this.searchValue !== '' || this.selectedOption !== '') {
+        //     this.Search();
+        // } else {
+        //     this.fetchData();
+        // }
     },
     watch: {
         pageParam: async function () {
-            this.refreshData();
+            if (this.searchValue !== '' || this.selectedOption !== '') {
+                this.Search();
+            } else {
+                this.fetchData();
+            }
         },
-        listUsers: {
+        listorders: {
             deep: true,
             immediate: true,
             handler(newVal) {
@@ -225,21 +238,58 @@ export default {
         },
     },
     methods: {
-        refreshData() {
-            if (this.searchValue !== '') {
-                this.Search();
-            } else {
-                this.fetchData();
+        async downloadFile() {
+            const { selectedOption, searchValue } = this;
+            let apiURL = `/orders?pageNumber=1&pageSize=10&isConvert=true`;
+            if (selectedOption && selectedOption !== 'Tất cả') {
+                apiURL += `&ordersType=${selectedOption}`;
+            }
+            if (searchValue) {
+                apiURL += `&searchQuery=${searchValue}`;
+            }
+            try {
+                const response = await this.$axios({
+                    method: 'get',
+                    url: apiURL,
+                    responseType: 'blob', // yêu cầu Axios trả về dữ liệu dạng blob (binary large object)
+                });
+                // Tạo đường dẫn đến tệp được tải xuống
+                const url = window.URL.createObjectURL(
+                    new Blob([response.data])
+                );
+                // Tạo một thẻ a để kích hoạt tải xuống tệp
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'SoTheoDoiToChuc.xlsx');
+                document.body.appendChild(link);
+                link.click();
+                // Xóa đối tượng thẻ a để tránh hiển thị thừa trên trang
+                document.body.removeChild(link);
+                this.notiAction = 'Export';
+                this.notiObject = 'file';
+                this.notiType = 'thành công';
+                this.showNotification = true;
+                setTimeout(() => {
+                    this.showNotification = false;
+                }, 3000);
+            } catch (error) {
+                this.notiAction = 'Export';
+                this.notiObject = 'file';
+                this.notiType = 'thất bại';
+                this.showNotification = true;
+                setTimeout(() => {
+                    this.showNotification = false;
+                }, 3000);
             }
         },
         async fetchData() {
             try {
                 const response = await this.$axios.get(
-                    `/users?page=${this.currentPage}`
+                    `/orders?pageNumber=${this.currentPage}&pageSize=10`
                 );
-                this.listUsers = response.data.data;
+                this.listorders = response.data.data;
                 this.meta = response.data.meta;
-                console.log(this.listUsers);
+                console.log(this.listorders);
             } catch (error) {
                 console.log(error);
                 this.notiAction = 'Tải';
@@ -251,14 +301,23 @@ export default {
                 }, 3000);
             }
         },
+        async fetchDetail(id) {
+            try {
+                await this.$axios.get(`/orders/${id}`).then((res) => {
+                    this.currentOrders = res['data']['data'];
+                    console.log(this.currentOrders);
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        },
         async Search() {
-            console.log('search');
             this.currentPage = this.pageParam;
             try {
-                const { currentPage, permission, searchValue } = this;
-                let url = `/users?pageNumber=${currentPage}&pageSize=10`;
-                if (permission && permission != '') {
-                    url += `&permission=${permission}`;
+                const { currentPage, selectedOption, searchValue } = this;
+                let url = `/orders?pageNumber=${currentPage}&pageSize=10`;
+                if (selectedOption && selectedOption !== 'Tất cả') {
+                    url += `&ordersType=${selectedOption}`;
                 }
                 if (searchValue) {
                     url += `&searchQuery=${searchValue}`;
@@ -266,19 +325,19 @@ export default {
                 const {
                     data: { data, meta },
                 } = await this.$axios.get(url);
-                this.listUsers = data;
+                this.listorders = data;
                 this.meta = meta;
-                console.log(this.listUsers);
-                // Lưu trạng thái của permission và searchValue vào URL của trang web
+                console.log(this.listorders);
+                // Lưu trạng thái của selectedOption và searchValue vào URL của trang web
                 const query = {};
-                if (permission != '') {
-                    query.permission = permission;
+                if (selectedOption) {
+                    query.type = selectedOption;
                 }
                 if (searchValue) {
                     query.search = searchValue;
                 }
                 this.$router.push({
-                    path: `/users?page=${currentPage}`,
+                    path: `/orders?page=${currentPage}`,
                     query,
                 });
             } catch (error) {
@@ -299,18 +358,16 @@ export default {
                 this.Search();
             }, 700); // tạo mới setTimeout() với thời gian chờ là 700ms
         },
-        async addUser(user) {
+        async addorders(orders) {
             try {
-                await this.$axios.post(`/users`, {
-                    userID: user.userID,
-                    username: user.username,
-                    password: user.password,
-                    fullName: user.fullName,
-                    userRole: user.userRole,
+                await this.$axios.post(`/orders`, {
+                    ordersID: '',
+                    ordersName: orders.ordersName,
+                    ordersType: orders.ordersType,
                 });
                 this.fetchData();
                 this.notiAction = 'Thêm mới';
-                this.notiObject = 'user';
+                this.notiObject = 'tổ chức';
                 this.notiType = 'thành công';
                 this.showNotification = true;
                 setTimeout(() => {
@@ -318,7 +375,7 @@ export default {
                 }, 3000);
             } catch (error) {
                 this.notiAction = 'Thêm mới';
-                this.notiObject = 'user';
+                this.notiObject = 'tổ chức';
                 this.notiType = 'thất bại';
                 this.showNotification = true;
                 setTimeout(() => {
@@ -327,40 +384,19 @@ export default {
                 console.log(error);
             }
         },
-        async deleteUser() {
+        async updateorders(orders) {
             try {
-                await this.$axios.delete(`/users/${this.UserID}`);
-                this.notiAction = 'Xóa';
-                this.notiObject = 'người dùng';
-                this.notiType = 'thành công';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-                this.fetchData();
-            } catch (error) {
-                this.notiAction = 'Xóa';
-                this.notiObject = 'người dùng';
-                this.notiType = 'thất bại';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-                console.log(error);
-            }
-        },
-        async updateUser(user) {
-            try {
-                await this.$axios.put(`/users/${user.userID}`, {
-                    userID: user.userID,
-                    username: user.username,
-                    password: user.password,    
-                    fullName: user.fullName,
-                    userRole: user.userRole,
-                });
+                await this.$axios.put(
+                    `/orders/${orders.ordersID}`,
+                    {
+                        ordersID: orders.ordersID,
+                        ordersName: orders.ordersName,
+                        ordersType: orders.ordersType,
+                    }
+                );
                 this.fetchData();
                 this.notiAction = 'Cập nhật';
-                this.notiObject = 'user';
+                this.notiObject = 'tổ chức';
                 this.notiType = 'thành công';
                 this.showNotification = true;
                 setTimeout(() => {
@@ -368,7 +404,7 @@ export default {
                 }, 3000);
             } catch (error) {
                 this.notiAction = 'Cập nhật';
-                this.notiObject = 'user';
+                this.notiObject = 'tổ chức';
                 this.notiType = 'thất bại';
                 this.showNotification = true;
                 setTimeout(() => {
@@ -377,13 +413,27 @@ export default {
                 console.log(error);
             }
         },
-        async fetchDetail(id) {
+        async deleteorders() {
             try {
-                await this.$axios.get(`/users/${id}`).then((res) => {
-                    this.currentUser = res['data']['data'];
-                    console.log(this.currentUser);
-                });
+                await this.$axios.delete(
+                    `/orders/${this.ordersID}`
+                );
+                this.notiAction = 'Xóa';
+                this.notiObject = 'đơn hàng';
+                this.notiType = 'thành công';
+                this.showNotification = true;
+                setTimeout(() => {
+                    this.showNotification = false;
+                }, 3000);
+                this.fetchData();
             } catch (error) {
+                this.notiAction = 'Xóa';
+                this.notiObject = 'đơn hàng';
+                this.notiType = 'thất bại';
+                this.showNotification = true;
+                setTimeout(() => {
+                    this.showNotification = false;
+                }, 3000);
                 console.log(error);
             }
         },
@@ -419,24 +469,22 @@ export default {
                 this.notiObject = object;
                 this.isShowPopup = true;
             } else {
-                this.notiObject = object;
                 this.isShowPopup = true;
-                this.UserID = id;
+                this.ordersID = id;
                 console.log(id);
             }
             this.notiAction = action;
         },
-        submitForm(action, user) {
+        submitForm(action, orders) {
             console.log(action);
-            console.log(user);
             this.isShowPopup = false;
             if (action === 'xóa') {
-                this.deleteUser();
+                this.deleteorders();
             } else if (action === 'thêm mới') {
-                if (!user.userID) {
-                    this.addUser(user);
+                if (!orders.ordersID) {
+                    this.addorders(orders);
                 } else {
-                    this.updateUser(user);
+                    this.updateorders(orders);
                 }
             } else {
                 this.downloadFile();
@@ -444,13 +492,16 @@ export default {
         },
         closePopup() {
             this.isShowPopup = '';
-            this.currentUser = {};
+            this.currentOrders = {};
         },
         goToIndexPage() {
             const query = {};
             query.page = this.currentPage;
-            if (this.permission) {
-                query.status = this.permission;
+            if (this.selectedOption) {
+                query.status = this.selectedOption;
+            }
+            if (this.searchValue) {
+                query.search = this.searchValue;
             }
             this.$router.push({
                 query: query,
@@ -467,20 +518,21 @@ export default {
 </script>
 
 <style scoped src="../../static/css/table_assets.css"></style>
+
 <style scoped>
 .stt-col{
     width: 10%;
 }
-.name-col{
+.day-col{
+    width: 20%;
+}
+.type-col{
     width: 25%;
 }
-.email-col{
+.appoint-day-col{
     width: 20%;
 }
-.address-col{
-    width: 20%;
-}
-.phone-number-col{
+.appoint-time-col{
     width: 20%;
 }
 .tool-col{

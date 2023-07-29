@@ -25,7 +25,7 @@
                         </div>
                         <div class="detail-container">
                             <p class="detail-title">Phòng đang sử dụng</p>
-                            <p class="detail">{{ currentAsset.roomID }}</p>
+                            <p class="detail">{{ currentAsset.BillID }}</p>
                         </div>
                         <div class="detail-container">
                             <p class="detail-title">Năm sử dụng</p>
@@ -69,11 +69,11 @@
 </template>
 
 <script>
-import AssetItem from '@/components/Asset/AssetItem.vue';
+import DriverItem from '@/components/Driver/DriverItem.vue';
 
 export default {
     components: {
-        AssetItem,
+        DriverItem,
     },
     data() {
         return {

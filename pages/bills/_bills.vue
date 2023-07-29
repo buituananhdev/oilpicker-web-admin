@@ -15,20 +15,20 @@
             @closePopup="closePopup"
             @submitForm="submitForm"
         ></PopUp>
-        <CreateRoom
+        <CreateBill
             :type="'update'"
-            :roomProp="currentRoom"
+            :BillProp="currentBill"
             :listOrganizations="listOrganizations"
             v-if="isShowPopup === 'thêm mới'"
             @closePopup="closePopup"
             @submitForm="submitForm"
         >
-        </CreateRoom>
+        </CreateBill>
         <Header class="page-top"></Header>
         <TabLeft @closeTab="closeTab()" @openTab="openTab()"></TabLeft>
         <div class="main-content">
             <div class="page-main">
-                <h1 class="page-main-title">Danh sách phòng</h1>
+                <h1 class="page-main-title">Danh sách hóa đơn</h1>
                 <div class="action-container">
                     <div class="search">
                         <input
@@ -44,37 +44,30 @@
                             alt=""
                         />
                     </div>
-                    <multiselect
-                        class="multiselect"
-                        :options="listOrganizations"
-                        v-model="selectedOption"
-                        label="organizationName"
-                        placeholder="Chọn hoặc tìm kiếm tổ chức"
-                        @input="Search"
-                    ></multiselect>
-                    <div class="btn-container">
-                        <button
-                            class="create-btn"
-                            @click="showPopup('xuất file', 'bảng dữ liệu')"
-                        >
-                            Xuất file excel
-                        </button>
-                        <button
-                            class="create-btn"
-                            @click="isShowPopup = 'thêm mới'"
-                        >
-                            Thêm phòng
-                        </button>
-                    </div>
+                    
                 </div>
                 <div class="table-assets">
                     <span class="table-assets-title div-center">
                         <p class="div-center stt-col">STT</p>
-                        <p class="div-center organization-type-col">Mã phòng</p>
-                        <p class="div-center organization-name-col">
-                            Tên Phòng
+                        <p class="div-center client-name-col">
+                            Tên khách hàng
                         </p>
-                        <p class="div-center show-action-col">Action</p>
+                        <p class="div-center driver-name-col">
+                            Tên tài xế
+                        </p>
+                        <p class="div-center time-col">
+                            Thời gian
+                        </p>
+                        <p class="div-center oil-col">
+                            Số lượng
+                        </p>
+                        <p class="div-center total-bill-col">
+                            Giá tiền
+                        </p>
+                        <p class="div-center payment-col">
+                            Phương thức giao dịch
+                        </p>
+                        <p class="div-center show-action-col tool-col"></p>
                     </span>
                     <div class="empty-icn div-center" v-show="!isHaveContent">
                         <img
@@ -83,15 +76,15 @@
                         />
                         <h1 class="empty-err-mess">Không có dữ liệu</h1>
                     </div>
-                    <RoomItem
-                        v-for="(item, index) in listRooms"
-                        :type="'room'"
+                    <BillItem
+                        v-for="(item, index) in listBills"
+                        :type="'Bill'"
                         :key="index"
                         :itemProp="item"
                         :itemIndex="index + 1"
                         @showPopup="showPopup"
                         style="width: 100%"
-                    ></RoomItem>
+                    ></BillItem>
                 </div>
                 <div class="pagination">
                     <div
@@ -150,21 +143,31 @@
 </template>
 
 <script>
-import RoomItem from '@/components/Room/RoomItem.vue';
-import CreateRoom from '@/components/Room/CreateRoom.vue';
+import BillItem from '@/components/Bill/BillItem.vue';
+import CreateBill from '@/components/Bill/CreateBill.vue';
 export default {
     components: {
-        RoomItem,
-        CreateRoom,
+        BillItem,
+        CreateBill,
     },
     data() {
         return {
             listOrganizations: [],
-            listRooms: [],
-            currentRoom: {},
+            listBills: [
+                {
+                    id: '6a386c58-dd12-44b8',
+                    seller: 'abc',
+                    buyer: 'Oilpicker',
+                    date_issued: '12/23/2023',
+                    quantity: '20',
+                    totalBill: '20000',
+                    payment_method: 'Momo'
+                },
+            ],
+            currentBill: {},
             meta: [],
             currentPage: 1,
-            roomID: {},
+            BillID: {},
             isHaveContent: false,
             isShowPopup: '',
             showNotification: false,
@@ -194,14 +197,14 @@ export default {
         if (this.pageOrganization != undefined) {
             this.fetchDetailOrganization();
         }
-        this.refreshData();
-        this.fetchListOrganization();
+        //this.refreshData();
+        //this.fetchListOrganization();
     },
     watch: {
         pageParam: async function () {
             this.refreshData();
         },
-        listRooms: {
+        listBills: {
             deep: true,
             immediate: true,
             handler(newVal) {
@@ -228,7 +231,7 @@ export default {
         },
         async downloadFile() {
             const { selectedOption, searchValue, organizationID } = this;
-            let apiURL = `/rooms?pageNumber=1&pageSize=10&isConvert=true`;
+            let apiURL = `/Bills?pageNumber=1&pageSize=10&isConvert=true`;
             if (selectedOption) {
                 apiURL += `&organization_id=${selectedOption.organizationID}`;
             }
@@ -276,9 +279,9 @@ export default {
         async fetchData() {
             try {
                 const response = await this.$axios.get(
-                    `/rooms?pageNumber=${this.currentPage}&pageSize=10`
+                    `/Bills?pageNumber=${this.currentPage}&pageSize=10`
                 );
-                this.listRooms = response.data.data;
+                this.listBills = response.data.data;
                 this.meta = response.data.meta;
                 console.log(this.meta);
             } catch (error) {
@@ -301,7 +304,7 @@ export default {
                     searchValue,
                     organizationID,
                 } = this;
-                let url = `/rooms?pageNumber=${currentPage}&pageSize=10`;
+                let url = `/Bills?pageNumber=${currentPage}&pageSize=10`;
                 if (selectedOption) {
                     url += `&organization_id=${selectedOption.organizationID}`;
                 }
@@ -314,9 +317,9 @@ export default {
                 const {
                     data: { data, meta },
                 } = await this.$axios.get(url);
-                this.listRooms = data;
+                this.listBills = data;
                 this.meta = meta;
-                console.log(this.listRooms);
+                console.log(this.listBills);
                 // Lưu trạng thái của selectedOption và searchValue vào URL của trang web
                 const query = {};
                 if (selectedOption) {
@@ -329,7 +332,7 @@ export default {
                     query.search = searchValue;
                 }
                 this.$router.push({
-                    path: `/rooms?page=${currentPage}`,
+                    path: `/Bills?page=${currentPage}`,
                     query,
                 });
             } catch (error) {
@@ -350,12 +353,12 @@ export default {
                 this.Search();
             }, 700); // tạo mới setTimeout() với thời gian chờ là 700ms
         },
-        async addRoom(room) {
+        async addBill(Bill) {
             try {
-                await this.$axios.post(`/rooms`, {
-                    roomID: room.roomID,
-                    roomName: room.roomName,
-                    organizationID: room.organizationID.organizationID,
+                await this.$axios.post(`/Bills`, {
+                    BillID: Bill.BillID,
+                    BillName: Bill.BillName,
+                    organizationID: Bill.organizationID.organizationID,
                 });
                 this.fetchData();
                 this.notiAction = 'Thêm mới';
@@ -376,12 +379,12 @@ export default {
                 console.log(error);
             }
         },
-        async updateRoom(room) {
+        async updateBill(Bill) {
             try {
-                await this.$axios.put(`/rooms/${room.roomID}`, {
-                    roomID: room.roomID,
-                    roomName: room.roomName,
-                    organizationID: room.organizationID.organizationID,
+                await this.$axios.put(`/Bills/${Bill.BillID}`, {
+                    BillID: Bill.BillID,
+                    BillName: Bill.BillName,
+                    organizationID: Bill.organizationID.organizationID,
                 });
                 this.fetchData();
                 this.notiAction = 'Cập nhật';
@@ -404,7 +407,7 @@ export default {
         },
         async deleteAsset() {
             try {
-                await this.$axios.delete(`/rooms/${this.roomID}`);
+                await this.$axios.delete(`/Bills/${this.BillID}`);
                 this.notiAction = 'Xóa';
                 this.notiObject = 'phòng';
                 this.notiType = 'thành công';
@@ -426,7 +429,7 @@ export default {
         },
         async disposeAsset() {
             try {
-                await this.$axios.post(`/rooms/${this.roomID}`);
+                await this.$axios.post(`/Bills/${this.BillID}`);
                 this.notiAction = 'Thanh lý';
                 this.notiObject = 'phòng';
                 this.notiType = 'thành công';
@@ -481,9 +484,9 @@ export default {
         },
         async fetchDetail(id) {
             try {
-                await this.$axios.get(`/rooms/${id}`).then((res) => {
-                    this.currentRoom = res['data']['data'];
-                    console.log(this.currentRoom);
+                await this.$axios.get(`/Bills/${id}`).then((res) => {
+                    this.currentBill = res['data']['data'];
+                    console.log(this.currentBill);
                 });
             } catch (error) {
                 console.log(error);
@@ -522,12 +525,12 @@ export default {
                 this.isShowPopup = true;
             } else {
                 this.isShowPopup = true;
-                this.roomID = id;
+                this.BillID = id;
                 console.log(id);
             }
             this.notiAction = action;
         },
-        submitForm(action, room) {
+        submitForm(action, Bill) {
             console.log(action);
             this.isShowPopup = false;
             if (action === 'xóa') {
@@ -535,10 +538,10 @@ export default {
             } else if (action === 'thanh lý') {
                 this.disposeAsset();
             } else if (action === 'thêm mới') {
-                if (room.roomID) {
-                    this.updateRoom(room);
+                if (Bill.BillID) {
+                    this.updateBill(Bill);
                 } else {
-                    this.addRoom(room);
+                    this.addBill(Bill);
                 }
             } else {
                 this.downloadFile();
@@ -546,7 +549,7 @@ export default {
         },
         closePopup() {
             this.isShowPopup = '';
-            this.currentRoom = {};
+            this.currentBill = {};
         },
         goToIndexPage() {
             const query = {};
@@ -575,5 +578,29 @@ export default {
 <style scoped>
 .multiselect {
     width: 320px;
+}
+.stt-col{
+    width: 5%;
+}
+.client-name-col{
+    width: 20%;
+}
+.driver-name-col{
+    width: 20%;
+}
+.time-col{
+    width: 15%;
+}
+.oil-col{
+    width: 15%;
+}
+.total-bill-col{
+    width: 10%;
+}
+.payment-col{
+    width: 10%;
+}
+.tool-col{
+    width: 5%;
 }
 </style>

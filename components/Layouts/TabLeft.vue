@@ -39,10 +39,8 @@
 
 .logo-img {
     cursor: pointer;
-    width: 70px;
+    width: 150px;
     height: auto;
-    box-shadow: rgba(255, 255, 255, 0.1) 0px 6px 24px 0px,
-        rgba(255, 255, 255, 0.2) 0px 0px 0px 3px;
     transition: all 0.2s ease;
 }
 
@@ -165,60 +163,65 @@
             <div class="logo-container">
                 <img
                     class="logo-img"
-                    src="../../static/images/logo-dut.jpg"
+                    src="../../static/images/logo.png"
                     alt=""
-                    @click="$router.push('/assets?page=1')"
+                    @click="$router.push('/oils?page=1')"
                 />
             </div>
             <h1 id="app-name">
-                HỆ THỐNG QUẢN LÝ TÀI SẢN CỐ ĐỊNH TẠI TRƯỜNG ĐẠI HỌC BÁCH KHOA
+                HỆ THỐNG QUẢN LÝ ỨNG DỤNG OILPICKER
             </h1>
             <ul class="list-features">
-                <li
+                <!-- <li
                     :class="{ isActive: pageParam == '/assets' }"
                     @click="$router.push('/assets?page=1')"
+                > -->
+                <li
+                    :class="{ isActive: pageParam == '/oils' }"
+                    @click="$router.push('/oils?page=1')"
                 >
                     <img
                         class="feature-icn"
-                        src="../../static/icons/light.svg"
+                        src="../../static/icons/oil.svg"
                         alt=""
                     />
-                    <p class="feature-name">Tài sản</p>
+                    <p class="feature-name">Dầu</p>
                 </li>
                 <li
-                    :class="{ isActive: pageParam == '/disposed_assets' }"
-                    @click="$router.push('/disposed_assets?page=1')"
+                    :class="{ isActive: pageParam == '/drivers' }"
+                    @click="$router.push('/drivers?page=1')"
                 >
                     <img
                         class="feature-icn"
-                        src="../../static/icons/light-off.svg"
+                        src="../../static/icons/driver.svg"
                         alt=""
                     />
-                    <p class="feature-name">Tài sản đã thanh lý</p>
+                    <p class="feature-name">Tài xế</p>
                 </li>
+                
                 <li
-                    :class="{ isActive: pageParam == '/organizations' }"
-                    @click="$router.push('/organizations?page=1')"
+                    :class="{ isActive: pageParam == '/bills' }"
+                    @click="$router.push('/bills?page=1')"
                 >
                     <img
                         class="feature-icn"
-                        src="../../static/icons/building.svg"
+                        src="../../static/icons/bill.svg"
                         alt=""
                     />
-                    <p class="feature-name">Tổ chức</p>
+                    <p class="feature-name">Hóa đơn</p>
                 </li>
                 <li
-                    :class="{ isActive: pageParam == '/rooms' }"
-                    @click="$router.push('/rooms?page=1')"
+                    :class="{ isActive: pageParam == '/orders' }"
+                    @click="$router.push('/orders?page=1')"
                 >
                     <img
                         class="feature-icn"
-                        src="../../static/icons/door.svg"
+                        src="../../static/icons/order.svg"
                         alt=""
                     />
-                    <p class="feature-name">Phòng</p>
+                    <p class="feature-name">Đặt hàng</p>
                 </li>
-                <li
+                <!-- <li
                     :class="{ isActive: pageParam == '/users' }"
                     @click="$router.push('/users?page=1')"
                     v-show="currentRole == 'Quản trị viên'"
@@ -229,7 +232,7 @@
                         alt=""
                     />
                     <p class="feature-name">Tài khoản</p>
-                </li>
+                </li> -->
                 <li
                     :class="{ isActive: pageParam == '/statistics' }"
                     @click="$router.push('/statistics')"
@@ -240,6 +243,17 @@
                         alt=""
                     />
                     <p class="feature-name">Thống kê</p>
+                </li>
+                <li
+                    :class="{ isActive: pageParam == '/users' }"
+                    @click="$router.push('/users?page=1')"
+                >
+                <img
+                    class="feature-icn"
+                    src="../../static/icons/people-fill.svg"
+                    alt=""
+                />
+                    <p class="feature-name">Tài khoản</p>
                 </li>
                 <li
                     style="border-top: 0.5px solid #dfe0ebb7"

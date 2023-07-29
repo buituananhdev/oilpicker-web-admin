@@ -3,24 +3,48 @@
         <div class="item div-center">
             <p
                 class="div-center stt-col"
-                @click="$router.push(`/assets?page=1&room_id=${itemProp.roomID}`)"
+                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
                 {{ itemIndex }}
             </p>
             <p
-                class="div-center organization-type-col"
-                @click="$router.push(`/assets?page=1&room_id=${itemProp.roomID}`)"
+                class="div-center client-name-col"
+                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
-                {{ itemProp.roomID }}
+                {{ itemProp.seller }}
             </p>
             <p
-                class="div-center organization-name-col"
-                @click="$router.push(`/assets?page=1&room_id=${itemProp.roomID}`)"
+                class="div-center driver-name-col"
+                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
-                {{ itemProp.roomName }}
+                {{ itemProp.buyer }}
+            </p>
+            <p
+                class="div-center time-col"
+                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
+            >
+                {{ itemProp.date_issued }}
+            </p>
+            <p
+                class="div-center oil-col"
+                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
+            >
+                {{ itemProp.quantity }}
+            </p>
+            <p
+                class="div-center total-bill-col"
+                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
+            >
+                {{ itemProp.totalBill }}
+            </p>
+            <p
+                class="div-center payment-col"
+                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
+            >
+                {{ itemProp.payment_method }}
             </p>
             <span
-                class="div-center show-action-col"
+                class="div-center show-action-col tool-col"
                 @mouseover="showAction()"
                 @mouseleave="hideAction()"
             >
@@ -35,7 +59,7 @@
                             'showPopup',
                             'xóa',
                             'phòng',
-                            itemProp.roomID
+                            itemProp.BillID
                         )
                     "
                     @dispose="
@@ -43,7 +67,7 @@
                             'showPopup',
                             'thanh lý',
                             'phòng',
-                            itemProp.roomID
+                            itemProp.BillID
                         )
                     "
                     @update="
@@ -51,7 +75,7 @@
                             'showPopup',
                             'thêm mới',
                             'phòng',
-                            itemProp.roomID
+                            itemProp.BillID
                         )
                     "
                     @cancel_dispose="
@@ -59,7 +83,7 @@
                             'showPopup',
                             'hủy thanh lý',
                             'phòng',
-                            itemProp.roomID
+                            itemProp.BillID
                         )
                     "
                 ></Tooltip>
@@ -125,5 +149,32 @@ export default {
 }
 .evenLine {
     background: #dfe0eb;
+}
+.stt-col{
+    width: 5%;
+}
+.id-col{
+    width: 10%;
+}
+.client-name-col{
+    width: 20%;
+}
+.driver-name-col{
+    width: 20%;
+}
+.time-col{
+    width: 15%;
+}
+.oil-col{
+    width: 15%;
+}
+.total-bill-col{
+    width: 10%;
+}
+.tool-col{
+    width: 5%;
+}
+.payment-col{
+    width: 10%;
 }
 </style>

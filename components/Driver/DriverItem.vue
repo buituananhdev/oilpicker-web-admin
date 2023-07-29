@@ -8,54 +8,51 @@
                 {{ itemIndex }}
             </p>
             <p
-                class="div-center device-id-col"
-                @click="pushToDetails"
-            >
-                {{ itemProp.deviceID }}
-            </p>
-            <p
                 class="div-center name-col"
                 @click="pushToDetails"
             >
-                {{ itemProp.assetName }}
+                {{ itemProp.fullName }}
             </p>
             <p
-                class="div-center year-used-col"
+                class="div-center email-col"
                 @click="pushToDetails"
             >
-                {{ itemProp.yearOfUse }}
+                {{ itemProp.email }}
             </p>
             <p
-                class="div-center quantity-col"
+                class="div-center address-col"
                 @click="pushToDetails"
             >
-                {{ itemProp.quantity }}
+                {{ itemProp.address }}
             </p>
             <p
+                class="div-center phone-number-col"
+                @click="pushToDetails"
+            >
+                {{ itemProp.phoneNumber }}
+            </p>
+            <!-- <p
                 class="div-center cost-col"
                 @click="pushToDetails"
             >
                 {{ moneyFormart }}
-            </p>
-            <p class="div-center status-col" v-if="type == 'asset'">
-                {{ itemProp.status }}
-            </p>
-            <p class="div-center status-col" v-if="type == 'disposed'">
+            </p> -->
+            <!-- <p class="div-center status-col" v-if="type == 'disposed'">
                 {{ timeFormat }}
-            </p>
+            </p> -->
             <span
-                class="div-center show-action-col"
+                class="div-center show-action-col tool-col"
                 @mouseover="showAction()"
                 @mouseleave="hideAction()"
             >
                 <img src="../../static/icons/three-dots-vertical.svg" alt="" />
-                <Tooltip
+                <!-- <Tooltip
                     class="tooltip"
                     :class="'tooltip' + itemIndex"
                     :type="type"
                     @mouseover="showAction()"
                     @delete="
-                        $emit('showPopup', 'xóa', 'tài sản', itemProp.assetID)
+                        $emit('showPopup', 'xóa', 'tài xế', itemProp.assetID)
                     "
                     @dispose="
                         $emit('showPopup', 'thanh lý', 'tài sản', itemProp.assetID)
@@ -64,6 +61,18 @@
                         $emit('showPopup', 'thêm mới', 'tài sản', itemProp.assetID)
                     "
                     @cancel_dispose="$emit('showPopup', 'hủy thanh lý', 'tài sản', itemProp.assetID)"
+                ></Tooltip> -->
+                <Tooltip
+                    class="tooltip"
+                    :class="'tooltip' + itemIndex"
+                    :type="type"
+                    @mouseover="showAction()"
+                    @delete="
+                        $emit('showPopup', 'xóa', 'tài xế', itemProp.assetID)
+                    "
+                    @update="
+                        $emit('showPopup', 'thêm mới', 'tài xế', itemProp.assetID)
+                    "
                 ></Tooltip>
             </span>
         </div>
@@ -81,11 +90,11 @@ export default {
     },
     mounted() {
         let date = new Date(this.itemProp.dateDisposed); // Tạo đối tượng Date từ chuỗi thời gian
-        this.timeFormat = date.toLocaleDateString('vi-VN');
-        this.moneyFormart = this.itemProp.cost.toLocaleString('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-        });
+        // this.timeFormat = date.toLocaleDateString('vi-VN');
+        // this.moneyFormart = this.itemProp.cost.toLocaleString('vi-VN', {
+        //     style: 'currency',
+        //     currency: 'VND',
+        // });
     },
     computed: {
         pageParam() {
@@ -147,4 +156,27 @@ export default {
 .evenLine {
     background: #dfe0eb;
 }
+.stt-col{
+    width: 5%;
+}
+.name-col{
+    width: 25%;
+}
+.email-col{
+    width: 20%;
+}
+.address-col{
+    width: 20%;
+}
+.phone-number-col{
+    width: 20%;
+}
+
+.tool-col{
+    width: 5%;
+}
+.status-col{
+    width: 10%;
+}
+
 </style>

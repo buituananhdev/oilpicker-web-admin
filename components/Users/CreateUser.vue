@@ -46,7 +46,7 @@
                             errors.first('Họ và tên')
                         }}</span>
                     </div>
-                    <div class="status form-col">
+                    <!-- <div class="status form-col">
                         <p class="form-label">
                             Chức vụ
                             <small style="color: #c7422e">*</small>
@@ -66,7 +66,7 @@
                         <span v-show="errors.has('Chức vụ')" class="err">{{
                             errors.first('Chức vụ')
                         }}</span>
-                    </div>
+                    </div> -->
                     <div class="device-id form-col">
                         <p class="form-label">
                             Tên đăng nhập

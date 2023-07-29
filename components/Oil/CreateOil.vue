@@ -106,7 +106,7 @@ export default {
         return {
             currentOrganization: {},
             status: '',
-            listRooms: [],
+            listBills: [],
             checkBtn: false,
             showNotification: false,
             listType: ['Khoa', 'Phòng ban', 'Trung tâm'],
