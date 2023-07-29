@@ -16,7 +16,7 @@
             <p
             class="div-center type-col"
             >
-            {{ itemProp.order_type }}
+            {{ itemProp.order_type === 1 ? 'Đặt lấy ngay' : 'Đặt lịch định kì' }}
             </p>
             <p
                 class="div-center appoint-day-col"
@@ -25,11 +25,14 @@
                 {{ itemProp.recurring_day_of_week }}
             </p>
             <p
-                class="div-center appoint-time-col"
+                class="div-center appoint-time-col status-order"
 
             >
-                {{ itemProp.recurring_time }}
+                {{ itemProp.order_status == 'New' ? 'Nhận đơn' : itemProp.order_status == 'In progress' ? 'Đang đến' : itemProp.order_status == 'Areived' ? 'Đã đến' : itemProp.order_status == '' ? 'Giao dịch định kì' : 'Hoàn thành' }}
+                <img src="../../static/icons/right.svg" alt="" v-if="!isDone && itemProp.order_type === 1" class="image" @click="$emit('updateStatus', itemProp)">
+                <img src="../../static/icons/done.svg" alt="" v-show="itemProp.order_type === 1 && isDone"  class="image">
             </p>
+            
             <span
                 class="div-center show-action-col tool-col"
                 @mouseover="showAction()"
@@ -60,7 +63,12 @@
 <script>
 import { format, parse } from 'date-fns';
 export default {
-    props: ['type', 'itemProp', 'itemIndex'],
+    props: ['type', 'itemProp', 'itemIndex', 'isDone'],
+    data(){
+        return {
+            // isDone: false
+        }
+    },
     computed: {
         pageParam() {
             return this.$route.query.page;
@@ -110,10 +118,6 @@ export default {
 .item p {
     font-size: 15px;
 }
-.item:hover p {
-    color: #008cde;
-    text-decoration: underline;
-}
 .item:hover .custom-select-trigger {
     color: #008cde;
 }
@@ -138,4 +142,10 @@ export default {
 .tool-col{
     width: 5%;
 }
+.status-order{
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
 </style>

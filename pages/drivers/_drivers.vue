@@ -372,9 +372,9 @@ export default {
                 console.log(error);
             }
         },
-        async deleteAsset() {
+        async deleteDriver() {
             try {
-                await this.$axios.delete(`/drivers/${this.id}`);
+                await this.$axios.delete(`/users/${this.id}`);
                 this.showNotification = true;
                 this.refreshData();
                 setTimeout(() => {
@@ -416,13 +416,10 @@ export default {
         showPopup(action, object, id) {
             if (action == 'thêm mới') {
                 this.isShowPopup = action;
-            } else if (action == 'xuất file') {
-                this.notiObject = object;
+            } else if ( action == 'xóa' ){
+                alert('xoas')
                 this.isShowPopup = true;
-            } else {
-                this.isShowPopup = true;
-                this.assetID = id;
-                this.notiObject = object;
+                this.id = id;
             }
             this.notiAction = action;
         },
@@ -431,7 +428,7 @@ export default {
             console.log(asset);
             this.isShowPopup = false;
             if (action === 'xóa') {
-                this.deleteAsset();
+                this.deleteDriver();
             } else if (action === 'thêm mới') {
                 if (!asset.assetID) {
                     this.addDriver(asset);

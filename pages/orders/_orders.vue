@@ -78,7 +78,7 @@
                             Ngày hẹn lấy
                         </p>
                         <p class="div-center appoint-time-col">
-                            Thời gian hẹn
+                            Trạng thái đơn hàng
                         </p>
                         <p class="tool-col"></p>
                     </span>
@@ -95,7 +95,9 @@
                         :key="index"
                         :itemProp="item"
                         :itemIndex="index + 1"
+                        :isDone="isDone"
                         @showPopup="showPopup"
+                        @updateStatus="updateStatus"
                         style="width: 100%"
                     ></OrderItem>
                 </div>
@@ -180,6 +182,8 @@ export default {
             selectedOption: '',
             currentOrders: {},
             options: ['Tất cả', 'Khoa', 'Phòng ban', 'Trung tâm'],
+            statusUpdate: '',
+            isDone: false
         };
     },
     computed: {
@@ -194,13 +198,7 @@ export default {
         },
     },
     mounted() {
-        // this.searchValue = this.pageSearch;
-        // this.selectedOption = this.pageType;
-        // if (this.searchValue !== '' || this.selectedOption !== '') {
-        //     this.Search();
-        // } else {
-            this.fetchData();
-        // }
+        this.fetchData();
     },
     watch: {
         pageParam: async function () {
@@ -223,50 +221,6 @@ export default {
         },
     },
     methods: {
-        async downloadFile() {
-            const { selectedOption, searchValue } = this;
-            let apiURL = `/orders?page=1`;
-            if (selectedOption && selectedOption !== 'Tất cả') {
-                apiURL += `&ordersType=${selectedOption}`;
-            }
-            if (searchValue) {
-                apiURL += `&searchQuery=${searchValue}`;
-            }
-            try {
-                const response = await this.$axios({
-                    method: 'get',
-                    url: apiURL,
-                    responseType: 'blob', // yêu cầu Axios trả về dữ liệu dạng blob (binary large object)
-                });
-                // Tạo đường dẫn đến tệp được tải xuống
-                const url = window.URL.createObjectURL(
-                    new Blob([response.data])
-                );
-                // Tạo một thẻ a để kích hoạt tải xuống tệp
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'SoTheoDoiToChuc.xlsx');
-                document.body.appendChild(link);
-                link.click();
-                // Xóa đối tượng thẻ a để tránh hiển thị thừa trên trang
-                document.body.removeChild(link);
-                this.notiAction = 'Export';
-                this.notiObject = 'file';
-                this.notiType = 'thành công';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-            } catch (error) {
-                this.notiAction = 'Export';
-                this.notiObject = 'file';
-                this.notiType = 'thất bại';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-            }
-        },
         async fetchData() {
             try {
                 
@@ -274,8 +228,6 @@ export default {
                     `/orders?page=${this.currentPage}`
                 );
                 this.listOrders = response.data.data;
-                // const user = await this.fetchData(this.listOrders.id);
-                // this.listOrders.nameCustomer = user.data.data.fullname;
                 this.meta = response.data.meta;
                 console.log(this.listOrders);
             } catch (error) {
@@ -346,40 +298,29 @@ export default {
                 this.Search();
             }, 700); // tạo mới setTimeout() với thời gian chờ là 700ms
         },
-        async addorders(orders) {
-            try {
-                await this.$axios.post(`/orders`, {
-                    ordersID: '',
-                    ordersName: orders.ordersName,
-                    ordersType: orders.ordersType,
-                });
-                this.fetchData();
-                this.notiAction = 'Thêm mới';
-                this.notiObject = 'tổ chức';
-                this.notiType = 'thành công';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = '';
-                }, 3000);
-            } catch (error) {
-                this.notiAction = 'Thêm mới';
-                this.notiObject = 'tổ chức';
-                this.notiType = 'thất bại';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-                console.log(error);
+        checkStatus(status) {
+            if( status === 'New' ) 
+                this.statusUpdate = 'In progress';
+            else if( status === 'In progress' )
+                this.statusUpdate = 'Arrived';
+            else if( status === 'Arrived' ){
+                this.isDone = true;
+                this.statusUpdate = 'Done';
             }
+            
         },
-        async updateorders(orders) {
+        async updateStatus(itemProp) {
             try {
+                this.checkStatus(itemProp.order_status)
                 await this.$axios.put(
-                    `/orders/${orders.ordersID}`,
+                    `/orders/${itemProp.id}`,
                     {
-                        ordersID: orders.ordersID,
-                        ordersName: orders.ordersName,
-                        ordersType: orders.ordersType,
+                        user_id: itemProp.id,
+                        order_date: itemProp.order_date,
+                        order_status: this.statusUpdate,
+                        order_type : itemProp.order_type,
+                        recurring_day_of_week: itemProp.recurring_day_of_week,
+                        recurring_time: itemProp.recurring_time
                     }
                 );
                 this.fetchData();
@@ -468,14 +409,6 @@ export default {
             this.isShowPopup = false;
             if (action === 'xóa') {
                 this.deleteorders();
-            } else if (action === 'thêm mới') {
-                if (!orders.ordersID) {
-                    this.addorders(orders);
-                } else {
-                    this.updateorders(orders);
-                }
-            } else {
-                this.downloadFile();
             }
         },
         closePopup() {
