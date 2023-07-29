@@ -31,37 +31,13 @@
             >
                 {{ itemProp.phonenumber }}
             </p>
-            <!-- <p
-                class="div-center cost-col"
-                @click="pushToDetails"
-            >
-                {{ moneyFormart }}
-            </p> -->
-            <!-- <p class="div-center status-col" v-if="type == 'disposed'">
-                {{ timeFormat }}
-            </p> -->
             <span
                 class="div-center show-action-col tool-col"
                 @mouseover="showAction()"
                 @mouseleave="hideAction()"
             >
                 <img src="../../static/icons/three-dots-vertical.svg" alt="" />
-                <!-- <Tooltip
-                    class="tooltip"
-                    :class="'tooltip' + itemIndex"
-                    :type="type"
-                    @mouseover="showAction()"
-                    @delete="
-                        $emit('showPopup', 'xóa', 'tài xế', itemProp.assetID)
-                    "
-                    @dispose="
-                        $emit('showPopup', 'thanh lý', 'tài sản', itemProp.assetID)
-                    "
-                    @update="
-                        $emit('showPopup', 'thêm mới', 'tài sản', itemProp.assetID)
-                    "
-                    @cancel_dispose="$emit('showPopup', 'hủy thanh lý', 'tài sản', itemProp.assetID)"
-                ></Tooltip> -->
+                
                 <Tooltip
                     class="tooltip"
                     :class="'tooltip' + itemIndex"

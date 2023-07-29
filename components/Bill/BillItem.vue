@@ -3,43 +3,36 @@
         <div class="item div-center">
             <p
                 class="div-center stt-col"
-                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
                 {{ itemIndex }}
             </p>
             <p
                 class="div-center client-name-col"
-                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
-                {{ itemProp.seller }}
+                {{ nameCustomer }}
             </p>
             <p
                 class="div-center driver-name-col"
-                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
                 {{ itemProp.buyer }}
             </p>
             <p
                 class="div-center time-col"
-                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
                 {{ itemProp.date_issued }}
             </p>
             <p
                 class="div-center oil-col"
-                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
                 {{ itemProp.quantity }}
             </p>
             <p
                 class="div-center total-bill-col"
-                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
-                {{ itemProp.totalBill }}
+                {{ itemProp.unit_price }}
             </p>
             <p
                 class="div-center payment-col"
-                @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
                 {{ itemProp.payment_method }}
             </p>
@@ -95,10 +88,23 @@
 <script>
 export default {
     props: ['type', 'itemProp', 'itemIndex'],
+    data() {
+        return {
+            nameCustomer: ''
+        }
+    },
     computed: {
         pageParam() {
             return this.$route.query.page;
         },
+    },
+    watch: {
+        itemProp(){
+            this.fetchDetailUser();
+        }
+    },
+    mounted(){
+        this.fetchDetailUser();
     },
     methods: {
         showAction() {
@@ -111,6 +117,14 @@ export default {
                 .querySelector('.tooltip' + this.itemIndex)
                 .classList.remove('display-block');
         },
+        async fetchDetailUser(id) {
+            try {
+                const user = await this.$axios.get( `/users/${this.itemProp.seller}`);
+                this.nameCustomer = user.data.data.fullname;
+            } catch (error) {
+                console.log(error);
+            }
+        }
     },
 };
 </script>
@@ -160,7 +174,7 @@ export default {
     width: 20%;
 }
 .driver-name-col{
-    width: 20%;
+    width: 15%;
 }
 .time-col{
     width: 15%;
@@ -172,7 +186,7 @@ export default {
     width: 10%;
 }
 .tool-col{
-    width: 5%;
+    width: 7%;
 }
 .payment-col{
     width: 10%;

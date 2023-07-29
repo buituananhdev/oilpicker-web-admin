@@ -153,17 +153,7 @@ export default {
     data() {
         return {
             listOrganizations: [],
-            listBills: [
-                {
-                    id: '6a386c58-dd12-44b8',
-                    seller: 'abc',
-                    buyer: 'Oilpicker',
-                    date_issued: '12/23/2023',
-                    quantity: '20',
-                    totalBill: '20000',
-                    payment_method: 'Momo'
-                },
-            ],
+            listBills: [],
             currentBill: {},
             meta: [],
             currentPage: 1,
@@ -177,7 +167,7 @@ export default {
             searchValue: '',
             timeoutId: null, // thêm biến timeoutId vào component
             selectedOption: '',
-            options: ['Tất cả', 'Khoa', 'Phòng ban', 'Trung tâm'],
+            user: ''
         };
     },
     computed: {
@@ -193,12 +183,7 @@ export default {
     },
     mounted() {
         this.searchValue = this.pageSearch;
-        this.organizationID = this.pageOrganization;
-        if (this.pageOrganization != undefined) {
-            this.fetchDetailOrganization();
-        }
-        //this.refreshData();
-        //this.fetchListOrganization();
+        this.refreshData();
     },
     watch: {
         pageParam: async function () {
@@ -229,59 +214,13 @@ export default {
                 this.fetchData();
             }
         },
-        async downloadFile() {
-            const { selectedOption, searchValue, organizationID } = this;
-            let apiURL = `/Bills?pageNumber=1&pageSize=10&isConvert=true`;
-            if (selectedOption) {
-                apiURL += `&organization_id=${selectedOption.organizationID}`;
-            }
-            if (selectedOption === '' && organizationID) {
-                apiURL += `&organization_id=${organizationID}`;
-            }
-            if (searchValue) {
-                apiURL += `&searchQuery=${searchValue}`;
-            }
-            try {
-                const response = await this.$axios({
-                    method: 'get',
-                    url: apiURL,
-                    responseType: 'blob', // yêu cầu Axios trả về dữ liệu dạng blob (binary large object)
-                });
-                // Tạo đường dẫn đến tệp được tải xuống
-                const url = window.URL.createObjectURL(
-                    new Blob([response.data])
-                );
-                // Tạo một thẻ a để kích hoạt tải xuống tệp
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', 'SoTheoDoiPhong.xlsx');
-                document.body.appendChild(link);
-                link.click();
-                // Xóa đối tượng thẻ a để tránh hiển thị thừa trên trang
-                document.body.removeChild(link);
-                this.notiAction = 'Export';
-                this.notiObject = 'file';
-                this.notiType = 'thành công';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-            } catch (error) {
-                this.notiAction = 'Export';
-                this.notiObject = 'file';
-                this.notiType = 'thất bại';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-            }
-        },
         async fetchData() {
             try {
                 const response = await this.$axios.get(
-                    `/Bills?pageNumber=${this.currentPage}&pageSize=10`
+                    `/bills?page=${this.currentPage}&pageSize=10`
                 );
                 this.listBills = response.data.data;
+                console.log(this.listBills);
                 this.meta = response.data.meta;
                 console.log(this.meta);
             } catch (error) {
@@ -304,7 +243,7 @@ export default {
                     searchValue,
                     organizationID,
                 } = this;
-                let url = `/Bills?pageNumber=${currentPage}&pageSize=10`;
+                let url = `/Bills?page=${currentPage}&pageSize=10`;
                 if (selectedOption) {
                     url += `&organization_id=${selectedOption.organizationID}`;
                 }
@@ -351,59 +290,7 @@ export default {
             clearTimeout(this.timeoutId); // xóa bỏ setTimeout() trước đó (nếu có)
             this.timeoutId = setTimeout(() => {
                 this.Search();
-            }, 700); // tạo mới setTimeout() với thời gian chờ là 700ms
-        },
-        async addBill(Bill) {
-            try {
-                await this.$axios.post(`/Bills`, {
-                    BillID: Bill.BillID,
-                    BillName: Bill.BillName,
-                    organizationID: Bill.organizationID.organizationID,
-                });
-                this.fetchData();
-                this.notiAction = 'Thêm mới';
-                this.notiObject = 'tổ chức';
-                this.notiType = 'thành công';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = '';
-                }, 3000);
-            } catch (error) {
-                this.notiAction = 'Thêm mới';
-                this.notiObject = 'tổ chức';
-                this.notiType = 'thất bại';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-                console.log(error);
-            }
-        },
-        async updateBill(Bill) {
-            try {
-                await this.$axios.put(`/Bills/${Bill.BillID}`, {
-                    BillID: Bill.BillID,
-                    BillName: Bill.BillName,
-                    organizationID: Bill.organizationID.organizationID,
-                });
-                this.fetchData();
-                this.notiAction = 'Cập nhật';
-                this.notiObject = 'phòng';
-                this.notiType = 'thành công';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-            } catch (error) {
-                this.notiAction = 'Cập nhật';
-                this.notiObject = 'phòng';
-                this.notiType = 'thất bại';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = '';
-                }, 3000);
-                console.log(error);
-            }
+            }, 700); // tạo mới setTimeoupdateBillut() với thời gian chờ là 700ms
         },
         async deleteAsset() {
             try {
@@ -446,49 +333,6 @@ export default {
                 setTimeout(() => {
                     this.showNotification = false;
                 }, 3000);
-                console.log(error);
-            }
-        },
-        async fetchListOrganization() {
-            try {
-                const response = await this.$axios.get(`/organizations`);
-                this.listOrganizations = response.data.data;
-                console.log(this.listOrganizations);
-            } catch (error) {
-                console.log(error);
-                this.notiAction = 'Tải';
-                this.notiObject = 'dữ liệu';
-                this.notiType = 'thất bại';
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-            }
-        },
-        async fetchDetailOrganization() {
-            try {
-                await this.$axios
-                    .get(`/organizations/${this.organizationID}`)
-                    .then((res) => {
-                        this.selectedOption = res['data']['data'];
-                        console.log(this.selectedOption);
-                    });
-            } catch (error) {
-                this.setNotification('Tải', 'dữ liệu', 'thất bại');
-                this.showNotification = true;
-                setTimeout(() => {
-                    this.showNotification = false;
-                }, 3000);
-                console.log(error);
-            }
-        },
-        async fetchDetail(id) {
-            try {
-                await this.$axios.get(`/Bills/${id}`).then((res) => {
-                    this.currentBill = res['data']['data'];
-                    console.log(this.currentBill);
-                });
-            } catch (error) {
                 console.log(error);
             }
         },
@@ -537,14 +381,6 @@ export default {
                 this.deleteAsset();
             } else if (action === 'thanh lý') {
                 this.disposeAsset();
-            } else if (action === 'thêm mới') {
-                if (Bill.BillID) {
-                    this.updateBill(Bill);
-                } else {
-                    this.addBill(Bill);
-                }
-            } else {
-                this.downloadFile();
             }
         },
         closePopup() {
@@ -586,7 +422,7 @@ export default {
     width: 20%;
 }
 .driver-name-col{
-    width: 20%;
+    width: 15%;
 }
 .time-col{
     width: 15%;
@@ -601,6 +437,6 @@ export default {
     width: 10%;
 }
 .tool-col{
-    width: 5%;
+    width: 7%;
 }
 </style>

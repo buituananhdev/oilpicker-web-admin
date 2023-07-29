@@ -28,16 +28,17 @@
                     class="tooltip"
                     :class="'tooltip' + itemIndex"
                     :type="type"
+                    :obj="'user'"
                     @mouseover="showAction()"
                     @delete="
-                        $emit('showPopup', 'xóa', 'tài khoản', itemProp.userID)
+                        $emit('showPopup', 'xóa', 'tài khoản', itemProp.id)
                     "
                     @update="
                         $emit(
                             'showPopup',
                             'thêm mới',
                             'tài khoản',
-                            itemProp.userID
+                            itemProp.id
                         )
                     "
                 ></Tooltip>
