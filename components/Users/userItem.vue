@@ -5,7 +5,7 @@
                 {{ itemIndex }}
             </p>
             <p class="div-center name-col">
-                {{ itemProp.fullName }}
+                {{ itemProp.fullname }}
             </p>
             <p class="div-center email-col">
                 {{ itemProp.email }}
@@ -14,7 +14,7 @@
                 {{ itemProp.address }}
             </p>
             <p class="div-center phone-number-col">
-                {{ itemProp.phoneNumber }}
+                {{ itemProp.phonenumber }}
             </p>
 
             <div 
