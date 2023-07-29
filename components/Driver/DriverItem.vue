@@ -11,7 +11,7 @@
                 class="div-center name-col"
                 @click="pushToDetails"
             >
-                {{ itemProp.fullName }}
+                {{ itemProp.fullname }}
             </p>
             <p
                 class="div-center email-col"
@@ -29,7 +29,7 @@
                 class="div-center phone-number-col"
                 @click="pushToDetails"
             >
-                {{ itemProp.phoneNumber }}
+                {{ itemProp.phonenumber }}
             </p>
             <!-- <p
                 class="div-center cost-col"
