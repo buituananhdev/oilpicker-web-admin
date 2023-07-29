@@ -60,7 +60,7 @@ export default {
         },
     },
     created() {
-        //this.Username = localStorage.getItem('currentUsername');
+        this.Username = localStorage.getItem('currentUsername');
     },
     methods: {
         showAction() {

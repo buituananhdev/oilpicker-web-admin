@@ -26,8 +26,33 @@
         <Header class="page-top"></Header>
         <TabLeft @closeTab="closeTab()" @openTab="openTab()"></TabLeft>
         <div class="main-content">
-            <div class="page-main">
-                <h1 class="page-main-title">Danh sách dầu</h1>
+            <div class="table-assets container">
+                <div class="box">
+                    <p>Giá</p>
+                    <div class="content">{{moneyFormart}}</div>
+                    <div class="symbol">
+                        <div>vnd</div>
+                        <div>/</div>
+                        <div>lit</div>
+                    </div>
+                </div>
+                <div class="box">
+                    <p>Dầu trong kho</p>
+                    <div class="content">10000</div>
+                    <div class="symbol">
+                        <div>lit</div>
+                    </div>
+                </div>
+                <div class="box">
+                    <p>Dầu đã bán</p>
+                    <div class="content">100000</div>
+                    <div class="symbol">
+                        <div>lit</div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="page-main"> -->
+                <!-- <h1 class="page-main-title">Danh sách dầu</h1> -->
                 <!-- <div class="action-container">
                     <div class="search">
                         <input
@@ -90,22 +115,17 @@
                         <h1 class="empty-err-mess">Không có dữ liệu</h1>
                     </div>
                     <OilItem
-                        v-for="(item, index) in listOrganizations"
+                        v-for="(item, index) in listOil"
                         :type="'organization'"
                         :key="index"
-                        :itemProp="item"
+                        :listOil[0].pricem"
                         :itemIndex="index + 1"
                         @showPopup="showPopup"
                         style="width: 100%"
                     ></OilItem>
                 </div> -->
-                <div class="table-assets container">
-                    <div class="box">
-                        <div>Giá</div>
-                        <div></div>
-                    </div>
-                </div>
-                <div class="pagination">
+                
+                <!-- <div class="pagination">
                     <div
                         class="pagination-content div-center"
                         v-show="isHaveContent"
@@ -156,7 +176,7 @@
                         </span>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
@@ -171,21 +191,12 @@ export default {
     },
     data() {
         return {
-            listOrganizations: [
+            listOil: [
                 {
-                    id: '6a386c58-dd12-44b8',
-                    name: 'abc',
                     price: '20000',
                     available: '200',
                     sold: '1000'
-                },
-                {
-                    id: '6a386c58-dd12-44b8',
-                    name: 'abcddd',
-                    price: '20000',
-                    available: '200',
-                    sold: '1000'
-                },
+                }
             ],
             meta: [],
             currentPage: 1,
@@ -201,6 +212,7 @@ export default {
             selectedOption: '',
             currentOrganization: {},
             options: ['Tất cả', 'Khoa', 'Phòng ban', 'Trung tâm'],
+            moneyFormart: ''
         };
     },
     computed: {
@@ -213,6 +225,7 @@ export default {
         pageType() {
             return this.$route.query.type;
         },
+        
     },
     mounted() {
         // this.searchValue = this.pageSearch;
@@ -222,6 +235,17 @@ export default {
         // } else {
         //     this.fetchData();
         // }
+        console.log("listOil:", this.listOil);
+            if (this.listOil.length > 0) {
+                console.log("listOil[0]:", this.listOil[0]);
+                console.log("price:", this.listOil[0].price);
+            } else {
+                console.log("listOil is empty or undefined.");
+            }
+        this.moneyFormart = this.listOil[0].price.toLocaleString('vi-VN', {
+            style: 'currency',
+            currency: 'VND',
+        });
     },
     watch: {
         pageParam: async function () {
@@ -231,7 +255,7 @@ export default {
                 this.fetchData();
             }
         },
-        listOrganizations: {
+        listOil: {
             deep: true,
             immediate: true,
             handler(newVal) {
@@ -246,7 +270,7 @@ export default {
     methods: {
         async downloadFile() {
             const { selectedOption, searchValue } = this;
-            let apiURL = `/organizations?pageNumber=1&pageSize=10&isConvert=true`;
+            let apiURL = `/oil?pageNumber=1&pageSize=10&isConvert=true`;
             if (selectedOption && selectedOption !== 'Tất cả') {
                 apiURL += `&organizationType=${selectedOption}`;
             }
@@ -291,11 +315,11 @@ export default {
         async fetchData() {
             try {
                 const response = await this.$axios.get(
-                    `/organizations?pageNumber=${this.currentPage}&pageSize=10`
+                    `/oil?pageNumber=${this.currentPage}&pageSize=10`
                 );
-                this.listOrganizations = response.data.data;
+                this.listOil = response.data.data;
                 this.meta = response.data.meta;
-                console.log(this.listOrganizations);
+                console.log(this.listOil);
             } catch (error) {
                 console.log(error);
                 this.notiAction = 'Tải';
@@ -309,7 +333,7 @@ export default {
         },
         async fetchDetail(id) {
             try {
-                await this.$axios.get(`/organizations/${id}`).then((res) => {
+                await this.$axios.get(`/oil/${id}`).then((res) => {
                     this.currentOrganization = res['data']['data'];
                     console.log(this.currentOrganization);
                 });
@@ -321,7 +345,7 @@ export default {
             this.currentPage = this.pageParam;
             try {
                 const { currentPage, selectedOption, searchValue } = this;
-                let url = `/organizations?pageNumber=${currentPage}&pageSize=10`;
+                let url = `/oil?pageNumber=${currentPage}&pageSize=10`;
                 if (selectedOption && selectedOption !== 'Tất cả') {
                     url += `&organizationType=${selectedOption}`;
                 }
@@ -331,9 +355,9 @@ export default {
                 const {
                     data: { data, meta },
                 } = await this.$axios.get(url);
-                this.listOrganizations = data;
+                this.listOil = data;
                 this.meta = meta;
-                console.log(this.listOrganizations);
+                console.log(this.listOil);
                 // Lưu trạng thái của selectedOption và searchValue vào URL của trang web
                 const query = {};
                 if (selectedOption) {
@@ -343,7 +367,7 @@ export default {
                     query.search = searchValue;
                 }
                 this.$router.push({
-                    path: `/organizations?page=${currentPage}`,
+                    path: `/oil?page=${currentPage}`,
                     query,
                 });
             } catch (error) {
@@ -366,7 +390,7 @@ export default {
         },
         async addOrganization(organization) {
             try {
-                await this.$axios.post(`/organizations`, {
+                await this.$axios.post(`/oil`, {
                     organizationID: '',
                     organizationName: organization.organizationName,
                     organizationType: organization.organizationType,
@@ -393,7 +417,7 @@ export default {
         async updateOrganization(organization) {
             try {
                 await this.$axios.put(
-                    `/organizations/${organization.organizationID}`,
+                    `/oil/${organization.organizationID}`,
                     {
                         organizationID: organization.organizationID,
                         organizationName: organization.organizationName,
@@ -422,7 +446,7 @@ export default {
         async deleteOrganization() {
             try {
                 await this.$axios.delete(
-                    `/organizations/${this.organizationID}`
+                    `/oil/${this.organizationID}`
                 );
                 this.notiAction = 'Xóa';
                 this.notiObject = 'tổ chức';
@@ -547,14 +571,46 @@ export default {
 .container{
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 50px;
     width: 100%;
+    padding: 50px;
+    justify-content: space-around;
 }
 .box{
     border: 2px solid rgb(186, 186, 186);
-    padding: 10px;
-    width: calc((100%-10px)/2);
-    height: 70px;
+    padding: 20px;
+    width: calc((100% - 50px * 2)/3);
+    height: 200px;
     border-radius: 10px;
+    position: relative;
+}
+.box p{
+    font-size: 24px;
+    font-weight: 700;
+    color: #ca7616;
+    position: absolute;
+}
+.box .content{
+    display: flex;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    font-size: 44px;
+    color: #F8982B;
+    font-weight: 800;
+}
+
+.box .symbol{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(20%, -75%);
+    font-size: 44px;
+    color: #F8982B;
+    font-weight: 800;
 }
 </style>

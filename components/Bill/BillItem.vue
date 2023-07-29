@@ -35,7 +35,7 @@
                 class="div-center total-bill-col"
                 @click="$router.push(`/assets?page=1&Bill_id=${itemProp.BillID}`)"
             >
-                {{ itemProp.totalBill }}
+                {{ itemProp.unit_price }}
             </p>
             <p
                 class="div-center payment-col"

@@ -14,7 +14,7 @@
     top: 0;
     left: 0;
     bottom: 0;
-    background: #363740;
+    background: #F8982B;
     border-left: #8c8d90 solid 1px;
 }
 .page-left-container {
@@ -70,11 +70,11 @@
 }
 
 .list-features li:hover {
-    background: #4c4e5a;
+    background: #b66117;
 }
 
 .isActive {
-    background: #4c4e5a;
+    background: #b66117;
     border-left: solid 4px #dde2ff;
     animation: active 0.2s ease-in-out;
 }
@@ -95,7 +95,7 @@
     line-height: 22px;
     /* identical to box height */
     letter-spacing: 0.2px;
-    color: #dde2ff;
+    color: #ffffff;
 }
 
 .collapse-sidebar {
@@ -110,7 +110,7 @@
 }
 
 .collapse-sidebar:hover {
-    background: #4c4e5a;
+    background: #B66117;
 }
 
 .to-left-side,
@@ -233,7 +233,7 @@
                     />
                     <p class="feature-name">Tài khoản</p>
                 </li> -->
-                <li
+                <!-- <li
                     :class="{ isActive: pageParam == '/statistics' }"
                     @click="$router.push('/statistics')"
                 >
@@ -243,7 +243,7 @@
                         alt=""
                     />
                     <p class="feature-name">Thống kê</p>
-                </li>
+                </li> -->
                 <li
                     :class="{ isActive: pageParam == '/users' }"
                     @click="$router.push('/users?page=1')"

@@ -231,7 +231,7 @@ export default {
             this.currentPage = this.pageParam;
             try {
                 const { currentPage, permission, searchValue } = this;
-                let url = `/users?pageNumber=${currentPage}&pageSize=10`;
+                let url = `/users?page=${currentPage}`;
                 if (permission && permission != '') {
                     url += `&permission=${permission}`;
                 }
@@ -280,8 +280,8 @@ export default {
                     userID: user.userID,
                     username: user.username,
                     password: user.password,
-                    fullName: user.fullName,
-                    userRole: user.userRole,
+                    fullname: user.fullname,
+                    role: user.role,
                 });
                 this.fetchData();
                 this.notiAction = 'Thêm mới';
@@ -330,8 +330,8 @@ export default {
                     userID: user.userID,
                     username: user.username,
                     password: user.password,    
-                    fullName: user.fullName,
-                    userRole: user.userRole,
+                    fullname: user.fullname,
+                    role: user.role,
                 });
                 this.fetchData();
                 this.notiAction = 'Cập nhật';
