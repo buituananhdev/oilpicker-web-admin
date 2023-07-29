@@ -154,32 +154,7 @@ export default {
         return {
             UserID: '',
             searchValue: '',
-            listUsers: [
-                {
-                    id: '6a386c58-dd12-44b8',
-                    address: 'abc',
-                    bankId: '970422',
-                    bankNumber: '068866789999',
-                    email: 'anhanh2003+3@gmail.com',
-                    fullName: 'Bui Tuan Anh',
-                    password: '$2b',
-                    phoneNumber: '0342973670',
-                    qrcodeURL: 'https://storage.googleapis.com/oil-picker-project.appspot.com/qr_codes/qr_code_1690124695580.png',
-                    role: 'client'
-                },
-                {
-                    id: '6a386c58-dd12-44b8',
-                    address: 'abc',
-                    bankId: '970422',
-                    bankNumber: '068866789999',
-                    email: 'anhanh2003+3@gmail.com',
-                    fullName: 'Bui Tuan Anh',
-                    password: '$2b',
-                    phoneNumber: '0342973670',
-                    qrcodeURL: 'https://storage.googleapis.com/oil-picker-project.appspot.com/qr_codes/qr_code_1690124695580.png',
-                    role: 'client'
-                }
-            ],
+            listUsers: [],
             meta: [],
             currentPage: 1,
             isHaveContent: false,
